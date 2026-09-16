@@ -439,9 +439,9 @@ const S = {
 S.press = [...S.pages, ...S.scans];
 const OBJ = {
   watch:   ['uhr_pedro'],
-  raw:     ['24','25','26','27','28','29','34','35','36','37','38','39','40','41'].map(n=>'raw_imag00'+n),
+  raw:     ['24','26','28','29','34','35','36','37','38','39','40','41'].map(n=>'raw_imag00'+n),
   edits:   ['banknotennew','bayofhabana','cubabanknoteandstamp','cubaflagmoregraphic','cubanewscrystal','dragshow','peso2','chemi_breakfast','chemi_pedrocam','chemi_peso','lithoprinta3-1'],
-  booklet: ['scan_2026-04-20_13-58-26', ...['20-14-31','20-15-20','20-16-21','20-17-27','20-18-21','20-20-26','20-21-09','20-21-53','20-22-40','20-23-22','20-24-06','20-24-49'].map(s=>'scan_2026-08-25_'+s)],
+  booklet: [...['20-14-31','20-15-20','20-16-21','20-17-27','20-18-21','20-20-26','20-21-09','20-21-53','20-22-40','20-23-22','20-24-06','20-24-49'].map(s=>'scan_2026-08-25_'+s)],
   line:    ['dscf8434','dscf8438','dscf8442','dscf8470','dscf8472','dscf8544'],
 };
 for (const k in OBJ) OBJ[k] = OBJ[k].map(n=>'01_object/'+n);
