@@ -1,0 +1,5 @@
+.DS_Store
+index_v*_backup.html
+web/00_archive/collage.psd
+*.psd
+.*.ttf.*

@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>my first year studying viskom - an interactive desktop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* =====================================================================
+   F_DESKTOP — v9  (Backups: index_v7_backup.html, index_v8_backup.html)
+   ─────────────────────────────────────────────────────────────────────
+   ✏️  WHERE YOU CAN EDIT SAFELY — search this file for  ✏️ EDIT
+       · every block between  <!-- ✏️ EDIT … -->  and  <!-- ✏️ /EDIT -->
+       · TXT (scrolling desktop texts) → search  ✏️ EDIT TEXTS
+       Only change the words. Leave tags like <div …>, class=, data-… alone.
+   Keys: 1-5 project · n next · Esc back · ← → flip
+         t = switch transition (window / flash / bb / shutter) · r = reset countdown
+   ─────────────────────────────────────────────────────────────────────
+   COLOURS: change --accent (subtitles) and --folder (folder icons) in :root below.
+            Single folder: add style="--folder:#hex" to that folder.
+   FONTS registered for you: .laus (Lausanne 800) .forma (Forma DJR Micro Bold)
+            .planb (Plan B) .pxc (Pixelcastle) — add the class to any element.
+   ===================================================================== */
+@font-face{ font-family:'Acopia'; src:url('web/fonts/Acopia.otf') format('opentype');
+  unicode-range:U+20-2C,U+2E,U+30-5E,U+60-7E,U+C4,U+D6,U+DC,U+E4,U+F6,U+FC; }
+@font-face{ font-family:'Pix'; src:url('web/fonts/Silkscreen-Regular.ttf'); }
+@font-face{ font-family:'PixB'; src:url('web/fonts/Silkscreen-Bold.ttf'); }
+@font-face{ font-family:'Tiny'; src:url('web/fonts/Tiny5-Regular.ttf'); }
+@font-face{ font-family:'Term'; src:url('web/fonts/VT323-Regular.ttf'); }
+@font-face{ font-family:'Geo'; src:local('Europa'),local('Europa-Regular'),url('web/fonts/Europa.otf'),url('web/fonts/Jost.ttf'); font-weight:100 900; }
+@font-face{ font-family:'Hand'; src:url('web/fonts/HomemadeApple-Regular.ttf'); }
+@font-face{ font-family:'Laus'; src:url('web/fonts/Lausanne-800.otf'); }
+@font-face{ font-family:'Forma'; src:url('web/fonts/FormaDJRMicro-Bold-Testing.otf'); }
+@font-face{ font-family:'PlanB'; src:url('web/fonts/PLANB___.TTF'); }
+@font-face{ font-family:'PixCastle'; src:url('web/fonts/Pixelcastle-Regular.otf'); }
+@font-face{ font-family:'Planet'; src:local('Planet Kosmos'),local('PlanetKosmos'),url('web/fonts/PlanetKosmos.ttf'); }
+
+:root{
+  /* ✏️ EDIT COLOURS — accent = subtitles under the 5 chapters, folder = folder icons
+     options to try: #ff4fa3 pink · #ff2d6f hot pink · #c9ff3d lime · #4d7cff blue · #ff5a1f orange · #b58cff lilac */
+  --accent:#ff4fa3;
+  --folder:var(--accent);
+  --fg:#ededed; --mid:#9a9a9a; --dim:#5c5c5c; --bg:#0b0b0b; --paper:#f4f4f2; --ink:#111; }
+*{ box-sizing:border-box; }
+html,body{ margin:0; height:100%; background:#000; overflow:hidden; }
+#viewport{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#000; overflow:hidden; }
+#stage{ position:relative; width:1280px; height:800px; flex:0 0 auto; transform-origin:center; overflow:hidden;
+        font-family:Verdana,Geneva,sans-serif; color:var(--fg); background:var(--bg); user-select:none; cursor:default; }
+
+.ac  { font-family:'Acopia','Planet','Geo',Verdana,sans-serif; }
+.pl  { font-family:'Planet','Acopia','Geo',sans-serif; }
+.geo { font-family:'Geo',Verdana,sans-serif; }
+.pix { font-family:'Pix',Monaco,monospace; text-transform:uppercase; }
+.pixb{ font-family:'PixB','Pix',Monaco,monospace; text-transform:uppercase; }
+.tiny{ font-family:'Tiny',Monaco,monospace; }
+.term{ font-family:'Term',Monaco,monospace; }
+.hand{ font-family:'Comic Sans MS','Comic Sans','Chalkboard SE','Comic Neue',cursive; text-transform:none; letter-spacing:0; font-weight:bold; }
+.ttl.hand{ line-height:1.2; }
+.laus{ font-family:'Laus',Verdana,sans-serif; }
+.forma{ font-family:'Forma',Verdana,sans-serif; }
+.planb{ font-family:'PlanB',Impact,sans-serif; }
+.pxc{ font-family:'PixCastle',Monaco,monospace; }
+.todo{ color:var(--mid); font-style:italic; }
+.lnk{ text-decoration:underline; cursor:pointer; }
+[data-open],[data-go],.clk{ cursor:pointer; }
+
+/* drifting material */
+#drift{ position:absolute; inset:0; z-index:0; overflow:hidden; }
+#drift img.shp{ mix-blend-mode:normal; filter:drop-shadow(3px 3px 0 rgba(0,0,0,.5)); }
+#drift img{ position:absolute; top:0; left:0; mix-blend-mode:screen; filter:grayscale(1) contrast(1.1) brightness(.8); opacity:0; will-change:transform,opacity; }
+#shade{ position:absolute; inset:0; z-index:1; pointer-events:none; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 35%, rgba(0,0,0,.6) 100%); }
+
+/* countdown + home sticker */
+#countdown{ position:absolute; top:10px; right:18px; z-index:41; font-size:30px; line-height:1; color:var(--fg); letter-spacing:1px; }
+.light #countdown{ color:var(--ink); }
+#countdown.over{ color:var(--accent); }
+#homebtn{ position:absolute; left:14px; top:10px; width:64px; z-index:41; cursor:pointer; display:none; }
+.light #homebtn{ filter:drop-shadow(2px 2px 0 rgba(0,0,0,.35)); }
+/* (old menubar styles, unused) */
+#menubar{ position:absolute; top:0; left:0; right:0; height:20px; z-index:40; display:flex; align-items:center; gap:18px; padding:0 12px; background:rgba(0,0,0,.72); font-size:10px; }
+#menubar b{ font-family:'Acopia',sans-serif; font-weight:normal; font-size:12px; letter-spacing:.5px; }
+#menubar .sp{ flex:1; }
+.light #menubar{ background:rgba(244,244,242,.9); color:var(--ink); }
+.light #menubar span{ color:var(--ink); }
+
+/* hub */
+#hub{ position:absolute; inset:0; z-index:5; }
+.drg{ touch-action:none; }
+.drg.dragging{ cursor:grabbing !important; }
+.file{ position:absolute; text-align:center; }
+.file img,.file video{ display:block; margin:0 auto; border:1px solid #cfcfcf; background:#222; object-fit:cover; pointer-events:none; }
+.file span{ display:block; margin:3px 0 0 50%; transform:translateX(-50%); font-size:7px; line-height:1.15; color:#c8c8c8;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 0 3px #000,0 0 3px #000; }
+.file.loose img{ opacity:.7; }
+.file.loose span{ color:#8d8d8d; }
+.br{ animation:breathe 8s ease-in-out infinite; }
+@keyframes breathe{ 0%,100%{ opacity:.78; } 50%{ opacity:1; } }
+.ttl{ position:absolute; z-index:25; line-height:.9; white-space:nowrap; text-shadow:0 0 6px rgba(0,0,0,.8); }
+.ttl small{ display:block; font:8px Verdana; letter-spacing:2px; color:var(--accent); margin-top:5px; text-transform:uppercase; text-shadow:none; }
+
+#brand{ position:absolute; width:440px; left:420px; top:282px; z-index:24; text-align:center; }
+#brand .logo{ font-family:'Acopia',sans-serif; font-size:34px; line-height:1.15; letter-spacing:0; white-space:pre-line; }
+#brand .logo i{ font-style:normal; font-family:Verdana,sans-serif; font-size:50px; }
+#brand .under{ display:flex; justify-content:center; text-align:left; gap:22px; margin-top:10px; font-size:8px; line-height:1.5; letter-spacing:1px; color:#bdbdbd; text-transform:uppercase; }
+#brand .under .big{ font-family:'Geo',Verdana; font-size:15px; line-height:1.05; color:var(--fg); letter-spacing:0; text-transform:none; }
+#counter{ font-family:'Term',monospace; font-size:16px; letter-spacing:3px; color:var(--fg); }
+
+.win{ position:absolute; z-index:26; background:#dcdcdc; color:#111; box-shadow:2px 2px 0 rgba(0,0,0,.6); }
+.win .bar{ height:15px; display:flex; align-items:center; gap:6px; padding:0 5px; font-size:9px; cursor:grab;
+  background:repeating-linear-gradient(#dcdcdc 0 1px,#9c9c9c 1px 2px); }
+.win .bar b{ background:#dcdcdc; padding:0 5px; font-weight:normal; margin:0 auto; }
+.win .bar i{ width:9px; height:9px; background:#dcdcdc; box-shadow:inset 0 0 0 1px #555; cursor:pointer; position:relative; flex:0 0 auto; }
+.win .bar i:hover{ background:#111; }
+.win.closing{ animation:winclose .22s steps(4) forwards; }
+@keyframes winclose{ to{ transform:scale(.2,.02); opacity:0; } }
+.tile .tg{ display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); grid-auto-rows:64px; gap:4px; padding:5px; margin:0 3px 3px; background:#111; overflow:hidden; }
+.tile[data-group="watch"] .tg{ display:block; background:#fff; padding:6px; }
+.tile[data-group="watch"] .tg img{ object-fit:contain; }
+.tile[data-group="line"] .tg{ grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); grid-auto-rows:86px; }
+.tile[data-group="booklet"] .tg{ grid-template-columns:repeat(5,1fr); grid-auto-rows:64px; }
+.tile[data-group="pscans"] .tg{ grid-template-columns:repeat(5,1fr); grid-auto-rows:1fr; background:#fff; }
+.tile[data-group="pscans"] .tg img{ object-fit:contain; }
+.tile .tg img{ width:100%; height:100%; object-fit:cover; display:block; cursor:pointer; }
+.win .body{ padding:9px 11px 10px; font-size:9.5px; line-height:1.45; }
+#intro{ left:672px; top:62px; width:250px; }
+.txtwin .body{ height:var(--h,150px); overflow:hidden; padding:6px 9px; background:#f2f2f2; margin:0 3px 3px; }
+.txtwin pre{ margin:0; white-space:pre-wrap; font-family:Monaco,'Courier New',monospace; font-size:9px; line-height:1.35; color:#111; }
+
+#best{ position:absolute; left:606px; top:500px; z-index:26; padding-top:10px; }
+#best:before{ content:'::::'; position:absolute; top:-2px; left:0; font-size:9px; color:var(--dim); letter-spacing:1px; }
+#best select{ font:10px Verdana; width:170px; background:#e6e6e6; color:#111; border:1px solid #777; }
+#footer{ position:absolute; left:14px; bottom:8px; z-index:6; font-size:9px; color:var(--dim); letter-spacing:1px; }
+
+.folder{ position:absolute; z-index:30; text-align:center; width:80px; }
+.folder i{ display:block; width:44px; height:32px; margin:0 auto; background:var(--folder); position:relative; border-radius:1px; pointer-events:none; }
+.folder i:before{ content:''; position:absolute; left:0; top:-5px; width:18px; height:6px; background:var(--folder); border-radius:1px 3px 0 0; }
+.folder i:after{ content:''; position:absolute; left:0; right:0; top:6px; height:1px; background:rgba(0,0,0,.25); }
+.folder span{ display:block; font-size:7px; margin-top:4px; color:#c8c8c8; text-shadow:0 0 3px #000; }
+.doc i{ --folder:#ececec; background:#ececec; width:32px; height:40px; clip-path:polygon(0 0,72% 0,100% 22%,100% 100%,0 100%); }
+.doc i:before{ display:none; }
+.doc i:after{ left:6px; right:6px; top:14px; height:14px; background:repeating-linear-gradient(#999 0 1px,transparent 1px 4px); }
+
+/* views */
+.view{ position:absolute; inset:0; z-index:20; display:none; }
+.view.on{ display:block; }
+.view.paper{ background:var(--paper); color:var(--ink); }
+#navbar{ position:absolute; right:26px; bottom:18px; z-index:41; display:none; gap:26px; font-size:10px; }
+#navbar span{ cursor:pointer; }
+#navbar .num{ cursor:default; color:var(--mid); }
+.light #navbar{ color:var(--ink); }
+.vtitle{ position:absolute; left:34px; bottom:20px; font-size:34px; line-height:.9; }
+.vtitle small{ display:block; font:9px Verdana; letter-spacing:2px; color:var(--accent); margin-top:6px; text-transform:uppercase; }
+.vtitle{ white-space:nowrap; z-index:23; }
+
+.sticker{ position:absolute; z-index:22; filter:drop-shadow(3px 3px 0 rgba(0,0,0,.45)); pointer-events:auto; cursor:grab; touch-action:none; }
+.paper .sticker{ filter:drop-shadow(2px 2px 0 rgba(0,0,0,.35)); }
+.sticker.wh{ filter:drop-shadow(1px 1px 0 #000) drop-shadow(-1px -1px 0 #000) drop-shadow(3px 3px 0 rgba(0,0,0,.5)); }
+.card{ position:absolute; background:rgba(0,0,0,.86); padding:18px 22px; overflow:hidden; font-size:12.5px; line-height:1.4; }
+.card .f{ margin-bottom:12px; }
+.k{ display:block; font-family:'Pix',monospace; font-size:9px; letter-spacing:1px; color:var(--mid); text-transform:uppercase; margin-bottom:2px; }
+.paper .k{ color:#777; }
+
+.fr{ position:absolute; cursor:pointer; text-align:center; }
+.fr img{ display:block; width:100%; height:calc(100% - 16px); object-fit:cover; border:1px solid #cfcfcf; background:#111; }
+.fr span{ display:block; font-family:'Tiny',monospace; font-size:10px; margin-top:4px; color:#bdbdbd; }
+
+.marq{ position:absolute; overflow:hidden; }
+.marq .run{ display:flex; gap:4px; width:max-content; animation:marq 60s linear infinite; }
+.marq img{ height:50px; width:50px; object-fit:cover; cursor:pointer; border:1px solid #888; }
+@keyframes marq{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+.hint{ font-size:8px; letter-spacing:1px; color:var(--mid); }
+.tbtn{ font-size:9px; cursor:pointer; margin-right:14px; }
+
+/* white-page menu (press, fractions, questions) */
+.pmenu{ position:absolute; width:270px; text-align:right; }
+.pmenu h3{ margin:0 0 10px; font-family:'Acopia',sans-serif; font-weight:normal; font-size:24px; line-height:1; }
+.pmenu .it{ border-top:2px dotted var(--ink); padding:6px 0 8px; font-family:'Geo',Verdana; font-weight:600; font-size:15px; line-height:1.05; text-transform:uppercase; }
+.pmenu .it.sel{ cursor:pointer; color:#999; }
+.pmenu .it.sel.act{ color:var(--ink); }
+.pmenu .meta{ font-size:8px; line-height:1.5; letter-spacing:.5px; margin-top:12px; text-transform:uppercase; }
+
+/* 02 press */
+#ticker{ position:absolute; left:100px; right:130px; top:20px; height:22px; background:#0b0b0b; overflow:hidden; z-index:24; }
+#ticker .run2{ display:flex; width:max-content; white-space:nowrap; color:#f4f4f2; font-size:11px; line-height:22px; animation:marq 50s linear infinite; }
+#ticker .run2 span{ padding-right:40px; }
+#ticker em{ font-style:normal; color:var(--accent); }
+#ptable{ position:absolute; left:340px; top:60px; width:720px; height:650px; }
+#ptable .pin{ width:150px; box-shadow:3px 3px 0 rgba(0,0,0,.25); }
+#ptable .pin img{ border:1px solid #bbb; }
+#ptbtns{ position:absolute; left:340px; top:724px; color:var(--ink); }
+.paper .fr span{ color:#555; }
+#pg{ position:absolute; top:44px; left:420px; width:780px; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; }
+#pg img{ display:block; cursor:pointer; background:#ddd; }
+#pg.pages img{ height:244px; width:auto; }
+#pg.scans img{ height:196px; width:auto; }
+
+/* 03 calendar */
+#table{ position:absolute; left:548px; top:36px; width:710px; height:680px; }
+.pin{ position:absolute; width:130px; cursor:grab; box-shadow:4px 4px 0 rgba(0,0,0,.7); touch-action:none; }
+.pin img{ width:100%; height:auto; display:block; border:1px solid #eee; pointer-events:none; }
+.pin.drag{ cursor:grabbing; box-shadow:10px 10px 0 rgba(0,0,0,.7); }
+#flip{ position:absolute; left:34px; top:300px; width:492px; height:328px; cursor:pointer; background:#111; }
+#flip img{ width:100%; height:100%; object-fit:cover; display:block; border:1px solid #cfcfcf; }
+#flip span{ position:absolute; left:0; bottom:-16px; font-family:'Tiny',monospace; font-size:10px; color:#bdbdbd; }
+#tablebtns{ position:absolute; left:548px; top:724px; }
+
+/* 04 fractions — book */
+#book{ position:absolute; left:330px; top:50px; width:900px; height:636px; perspective:2400px; cursor:pointer; background:#2c2c2c; overflow:hidden; }
+#book .ly{ position:absolute; inset:0; background-repeat:no-repeat; }
+#book .L{ clip-path:inset(0 calc(50% - 1px) 0 0); }
+#book .R{ clip-path:inset(0 0 0 calc(50% - 1px)); }
+#leaf{ position:absolute; inset:0; transform-style:preserve-3d; display:none; }
+#leaf .ly{ backface-visibility:hidden; -webkit-backface-visibility:hidden; outline:1px solid transparent; }
+#leaf .ly.L, #leaf .ly.R{ background-color:#2c2c2c; }
+#leaf, #leaf .ly{ will-change:transform; }
+#leaf .back{ transform:rotateY(180deg); }
+#leaf .shade{ position:absolute; inset:0; pointer-events:none; }
+#pnums{ position:absolute; left:330px; top:712px; width:900px; font-size:9px; line-height:1.9; }
+#pnums span{ cursor:pointer; margin-right:9px; color:#aaa; }
+#pnums span.cur{ color:var(--ink); text-decoration:underline; }
+
+/* 05 post-digital */
+#vid{ position:absolute; left:34px; top:40px; width:430px; height:573px; background:#000; }
+#vid video{ width:100%; height:100%; object-fit:cover; display:block; border:1px solid #cfcfcf; }
+
+/* questions */
+#v-q .qs{ position:absolute; left:420px; top:120px; width:760px; font-family:'Geo',Verdana; font-size:25px; line-height:1.28; }
+#v-q .qs .f{ margin-bottom:40px; }
+
+/* lightbox */
+#lb{ position:absolute; inset:0; z-index:60; background:rgba(0,0,0,.94); display:none; }
+#lb.on{ display:block; }
+#lb img{ position:absolute; left:40px; top:34px; width:1200px; height:680px; object-fit:contain; }
+#lb .bar{ position:absolute; left:40px; right:40px; bottom:22px; display:flex; justify-content:space-between; font-size:10px; color:var(--fg); }
+#lb .bar span{ cursor:pointer; margin-left:24px; }
+#lb .cap{ font-family:'Tiny',monospace; font-size:12px; color:var(--mid); }
+
+/* transition canvas + loader */
+#fx{ position:absolute; inset:0; z-index:80; pointer-events:none; display:none; }
+#loader{ position:absolute; inset:0; z-index:90; background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+#loader .logo{ font-family:'Acopia',sans-serif; font-size:46px; line-height:1.15; text-align:center; white-space:pre-line; animation:focus 1.6s cubic-bezier(.2,.7,.3,1) both; }
+@keyframes focus{ from{ filter:blur(22px); opacity:0; transform:scale(1.15); } to{ filter:blur(0); opacity:1; transform:none; } }
+#loader .logo i{ font-style:normal; font-family:Verdana; font-size:56px; text-align: center;}
+#lbar{ display:flex; gap:3px; }
+#lbar i{ width:12px; height:12px; background:#2a2a2a; }
+#lbar i.on{ background:#ededed; }
+#lpct{ font-size:10px; letter-spacing:2px; color:var(--mid); }
+#enter{ visibility:hidden; font-size:11px; cursor:pointer; text-decoration:underline; }
+#loader small{ position:absolute; bottom:20px; font-size:8px; color:var(--dim); letter-spacing:1px; }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+  <div id="drift"></div>
+  <div id="shade"></div>
+
+  <div id="countdown" class="term">10:00</div>
+  <img id="homebtn" class="sticker" src="web/00_shapes/ebene_2.png" draggable="false" title="desktop">
+
+  <!-- ======================= HUB ======================= -->
+  <div id="hub">
+    <div id="files"></div>
+
+    <!-- ✏️ EDIT project titles + subtitles — they are automatically copied to the matching subpage -->
+    <div class="ttl hand drg" data-open="cal" style="left:56px;top:34px;font-size:30px;">ANNUAL CALENDAR<small>Module: Zine & Zeichnen</small></div>
+    <div class="ttl pixb drg" data-open="obj" style="left:950px;top:196px;font-size:26px;">LONGINES WATCH<small>Module: Labs2</small></div>
+    <div class="ttl geo drg" data-open="press" style="left:676px;top:612px;font-size:25px;font-weight:600;">CONSPIRACY NEWSPAPER<small>Module: Layout</small></div>
+    <div class="ttl pl drg" data-open="frac" style="left:62px;top:468px;font-size:27px;">BETWEEN FRACTIONS OF OUR LIFES<small>Week with Binta Kopp: Collaborative Zine</small></div>
+    <div class="ttl term drg" data-open="pd" style="left:958px;top:556px;font-size:32px;">POST DIGITAL 3D RENDER<small>Module: 3D Design</small></div>
+    <!-- ✏️ /EDIT -->
+
+    <div id="brand" class="drg">
+      <div class="logo">(✿ ♡‿♡)
+𝓂𝓎 𝒻𝒾𝓇𝓈𝓉 𝓎𝑒𝒶𝓇 𝒶𝓉 𝒽𝓀𝒷
+𝓈𝓉𝓊𝒹𝓎𝒾𝓃𝑔 𝓋𝒾𝓈𝓀𝑜𝓂
+(♡‿♡ ✿)</div>
+      <div class="under">
+        <!-- ✏️ EDIT -->
+        <div class="big">fabios virtual desktop</div>
+        <!-- ✏️ /EDIT -->
+      </div>
+    </div>
+
+    <div class="win drg txtwin" data-handle=".bar" data-txt="forum_leak.txt" style="left:24px;top:318px;width:210px;--h:120px;"><div class="bar"><i></i><b>forum_leak.txt</b></div><div class="body"><pre></pre></div></div>
+    <div class="win drg txtwin" data-handle=".bar" data-txt="cig_jester.txt" style="left:700px;top:112px;width:160px;--h:78px;"><div class="bar"><i></i><b>cig_jester.rtf</b></div><div class="body"><pre></pre></div></div>
+
+    <div id="best" class="drg">
+      <select id="bestsel">
+        <option value="">best links</option>
+        <option value="obj">01 Labsweek2 / Object</option>
+        <option value="press">02 Layout Module / Press</option>
+        <option value="cal">03 Zine / Calendar</option>
+        <option value="frac">04 Between Fractions Of Our Lifes</option>
+        <option value="pd">05 3D Module / Post-Digital</option>
+      </select>
+    </div>
+
+    <img class="sticker drg" src="web/00_shapes/ebene_2.png" style="left:560px;top:150px;width:92px;" draggable="false">
+    <img class="sticker drg wh" src="web/00_shapes/women.png" style="left:880px;top:640px;width:92px;" draggable="false">
+    <img class="sticker drg" src="web/00_shapes/rossofuoco.png" style="left:250px;top:150px;width:150px;" draggable="false">
+
+    <div class="folder clk drg" data-arch="01" style="left:430px;top:128px;"><i></i><span>01_semester</span></div>
+    <div class="folder clk drg" data-arch="02" style="left:1180px;top:140px;"><i></i><span>02_semester</span></div>
+    <div class="folder clk drg" data-arch="proc" style="left:250px;top:720px;"><i></i><span>process_pics</span></div>
+    <div class="folder clk drg" data-arch="all" style="left:370px;top:720px;"><i></i><span>hkb_everything</span></div>
+  </div>
+
+  <!-- ======================= VIEWS ======================= -->
+  <div class="view" id="v-obj" data-key="obj">
+    <div class="card" style="left:340px;top:150px;width:560px;height:420px;">
+      <!-- ✏️ EDIT project sheet (text after </span> is yours) -->
+      <div class="f"><span class="k">File</span>01_labsweek2_object</div>
+      <div class="f"><span class="k">Module</span>Labs Week 2, 2nd semester</div>
+      <div class="f"><span class="k">Starting object</span>a longines watch</div>
+      <div class="f"><span class="k">Techniques</span>chemigram, lithoprint</div>
+      <div class="f"><span class="k">Presentation</span>prints hanging on clothesline in the room</div>
+      <!-- ✏️ /EDIT -->
+    </div>
+    <img class="sticker" src="web/00_shapes/ebene_13.png" style="left:420px;top:60px;width:300px;" draggable="false">
+    <!-- ✏️ EDIT tile titles (the words inside <b>) -->
+    <div class="win tile" data-group="raw"     style="left:34px;top:70px;width:284px;"><div class="bar"><i></i><b>01_raw_scans</b></div><div class="body tg" style="height:282px;"></div></div>
+    <div class="win tile" data-group="edits"   style="left:34px;top:392px;width:284px;"><div class="bar"><i></i><b>02_edits</b></div><div class="body tg" style="height:214px;"></div></div>
+    <div class="win tile" data-group="watch"   style="left:940px;top:40px;width:280px;"><div class="bar"><i></i><b>00_the_watch</b></div><div class="body tg" style="height:190px;"></div></div>
+    <div class="win tile" data-group="booklet" style="left:924px;top:272px;width:316px;"><div class="bar"><i></i><b>03_booklet_repro</b></div><div class="body tg" style="height:212px;"></div></div>
+    <div class="win tile" data-group="line"    style="left:924px;top:522px;width:316px;"><div class="bar"><i></i><b>04_clothesline</b></div><div class="body tg" style="height:184px;"></div></div>
+    <!-- ✏️ /EDIT -->
+    <div class="marq" style="left:340px;top:596px;width:560px;"><div class="run" data-set="obj"></div></div>
+    <div class="vtitle"></div>
+  </div>
+
+  <div class="view paper" id="v-press" data-key="press">
+    <!-- ✏️ EDIT ticker text (words starting with # get the accent colour) -->
+    <div id="ticker" class="pix"><div class="run2" data-text="+++ breaking +++ hunderte biolumineszente signalcodes in der molloy-tiefe +++ #ThisIsOnlyTheTipOfTheIceberg +++ state date +++ krypto-farmen im methanhydrat +++ #WakeUp +++ unterwasserstartrampen mit ferrofluid-antrieb +++ #StopSpaceX +++ #LetTheOceanAlive +++ die tiefsee ist der perfekte rechtsfreie raum +++"></div></div>
+    <!-- ✏️ /EDIT -->
+    <div class="fr" style="left:40px;top:66px;width:262px;height:360px" data-src="02_press/einzelseiten_druck_300dpi-1"><img style="object-fit:contain;background:transparent;border:0;"><span>front_page.pdf</span></div>
+    <div class="win tile" data-group="pscans" style="left:40px;top:456px;width:300px;"><div class="bar"><i></i><b>scans</b></div><div class="body tg" style="height:96px;"></div></div>
+    <div class="win txtwin" data-handle=".bar" data-txt="forum_leak.txt" style="left:1070px;top:300px;width:180px;--h:150px;"><div class="bar"><i></i><b>article.txt</b></div><div class="body"><pre></pre></div></div>
+    <img class="sticker" src="web/00_shapes/ebene_10.png" style="left:1050px;top:510px;width:200px;" draggable="false">
+    <img class="sticker" src="web/00_shapes/ebene_16.png" style="left:1090px;top:70px;width:150px;" draggable="false">
+    <div id="ptable"></div>
+    <div id="ptbtns" class="pix"><span class="tbtn" id="pb-pile">stack it</span><span class="tbtn" id="pb-grid">spread it out</span><span class="tbtn" id="pb-shuffle">shuffle</span></div>
+    <div class="vtitle"></div>
+  </div>
+
+  <div class="view" id="v-cal" data-key="cal">
+    <div class="card" style="left:34px;top:40px;width:492px;height:236px;">
+      <!-- ✏️ EDIT -->
+      <div class="f"><span class="k">File</span>03_zine_drawing_calendar</div>
+      <div class="f"><span class="k">Format</span>calendar zine, 14 pages, 1st edition</div>
+      <div class="f"><span class="k">Material</span>marker, crayon, digitally coloured</div>
+      <!-- ✏️ /EDIT -->
+    </div>
+    <div id="flip"><img><span>flipbook</span></div>
+    <img class="sticker" src="web/00_shapes/ebene_16.png" style="left:380px;top:640px;width:150px;" draggable="false">
+    <img class="sticker" src="web/00_shapes/rossofuoco.png" style="left:1060px;top:56px;width:180px;" draggable="false">
+    <div id="table"></div>
+    <div id="tablebtns" class="pix">
+      <span class="tbtn" id="b-pile">stack it</span><span class="tbtn" id="b-grid">spread it out</span><span class="tbtn" id="b-shuffle">shuffle</span>
+    </div>
+    <div class="vtitle"></div>
+  </div>
+
+  <div class="view paper" id="v-frac" data-key="frac">
+    <div class="pmenu" style="left:30px;top:250px;">
+      <!-- ✏️ EDIT -->
+      <h3>04.Between Fractions Of Our Lifes</h3>
+      <div class="it">Collaborative Zine</div>
+      <div class="it">Spiral Binding<br>Various Materials</div>
+      <!-- ✏️ /EDIT -->
+      <div class="it"><span id="fr-num" class="term" style="font-size:44px;font-weight:normal;">01</span> <span id="fr-of" class="pix" style="font-size:9px;font-weight:normal;">/ 29</span></div>
+      <div class="meta"><span class="lnk" id="fr-prev">back</span> &nbsp; <span class="lnk" id="fr-next">next</span><br><br><!-- ✏️ EDIT -->sharon... i loved to work with you<!-- ✏️ /EDIT --></div>
+    </div>
+    <div id="book">
+      <div class="ly L" id="bL"></div><div class="ly R" id="bR"></div>
+      <div id="leaf"><div class="ly front" id="lf"></div><div class="ly back" id="lbk"></div><div class="shade" id="lsh"></div></div>
+    </div>
+    <div id="pnums" class="pix"></div>
+    <img class="sticker" src="web/00_shapes/ebene_1.png" style="left:34px;top:96px;width:50px;" draggable="false">
+    <img class="sticker wh" src="web/00_shapes/women.png" style="left:130px;top:70px;width:110px;" draggable="false">
+    <div class="vtitle"></div>
+  </div>
+
+  <div class="view" id="v-pd" data-key="pd">
+    <div id="vid"><video src="web/05_postdigital/chrome_loop.mp4" muted loop playsinline autoplay></video></div>
+    <div class="card" style="left:494px;top:40px;width:752px;height:250px;">
+      <!-- ✏️ EDIT -->
+      <div class="f"><span class="k">File</span>05_3d_module_post-digital</div>
+      <div class="f"><span class="k">Software</span>Blender, Polycam, Krea</div>
+      <div class="f"><span class="k">Material</span>photoscans, blenderkit, AI asset, meshes, etc.</div>
+      <!-- ✏️ /EDIT -->
+    </div>
+    <img class="sticker" src="web/00_shapes/ebene_18.png" style="left:1150px;top:200px;width:90px;" draggable="false">
+    <img class="sticker" src="web/00_shapes/ebene_2.png" style="left:380px;top:560px;width:110px;" draggable="false">
+    <div class="fr" style="left:494px;top:318px;width:360px;height:420px" data-src="05_postdigital/enhanced_new_render_forest"><img><span>enhanced_new_render_forest.png</span></div>
+    <div class="fr" style="left:886px;top:318px;width:360px;height:420px" data-src="05_postdigital/enhanced_forest6"><img><span>enhanced_forest6.jpg</span></div>
+    <div class="vtitle"></div>
+  </div>
+
+
+  <div id="navbar" class="pix"><span class="num" id="n-num">01/05</span><span id="n-next">next</span></div>
+
+  <div id="lb">
+    <img id="lb-img">
+    <div class="bar pix"><span class="cap" id="lb-cap" style="margin:0;cursor:default;"></span>
+      <div><span id="lb-prev">prev</span><span id="lb-next">next</span><span id="lb-x">close</span></div></div>
+  </div>
+
+  <canvas id="fx" width="1280" height="800"></canvas>
+
+  <div id="loader">
+    <div class="logo">(✿ ♡‿♡)
+𝓂𝓎 𝒻𝒾𝓇𝓈𝓉 𝓎𝑒𝒶𝓇 𝒶𝓉 𝒽𝓀𝒷
+𝓈𝓉𝓊𝒹𝓎𝒾𝓃𝑔 𝓋𝒾𝓈𝓀𝑜𝓂
+(♡‿♡ ✿)</div>
+    <div id="lbar"></div>
+    <div id="lpct" class="pix">loading 0%</div>
+    <span id="enter" class="pix">enter &gt;&gt;</span>
+  </div>
+
+</div></div>
+
+<script>
+/* ============================ DATA (dedupliziert: jedes Werk nur einmal) ============================ */
+const W = 'web/';
+const S = {
+  obj: ['banknotennew','bayofhabana','cubabanknoteandstamp','cubaflagmoregraphic','cubanewscrystal','dragshow',
+        'dscf8434','dscf8438','dscf8442','dscf8470','dscf8472','dscf8544','lithoprinta3-1','peso2','scan_2026-04-20_13-58-26',
+        ...['20-14-31','20-15-20','20-16-21','20-17-27','20-18-21','20-20-26','20-21-09','20-21-53','20-22-40','20-23-22','20-24-06','20-24-49'].map(s=>'scan_2026-08-25_'+s),
+        'uhr_pedro'].map(n=>'01_object/'+n),
+  pages: [1,2,3,4,5,6,7,8].map(i=>'02_press/einzelseiten_druck_300dpi-'+i),
+  scans: ['14-33-52','14-53-39','14-55-28','14-57-13','14-58-53'].map(s=>'02_press/scan_2026-08-25_'+s),
+  months: ['01','02','03','04','05','06','07','08','09','10','11','12','13','14'].map(i=>'03_calendar/zine_calendar_fabio_digital-version-'+i),
+  hands: Array.from({length:23},(_,i)=>'03_calendar/_e7a'+(6330+i)),
+  frac: ['18-11-20','18-13-17','18-18-24','18-43-36','18-58-09','18-58-53','19-01-33','19-03-06','19-06-33','19-08-38',
+         '19-32-22','19-33-51','19-35-09','19-35-53','19-37-10','19-41-15','19-42-20','19-43-01','19-44-19','19-45-07','19-59-10','20-01-48',
+         '20-03-05','20-04-15','20-05-03','20-05-43','20-07-14','20-09-50','20-12-43'].map(s=>'04_fractions/scan_2026-08-25_'+s),
+  pd: ['enhanced_new_render_forest','enhanced_forest6'].map(n=>'05_postdigital/'+n),
+};
+S.press = [...S.pages, ...S.scans];
+const OBJ = {
+  watch:   ['uhr_pedro'],
+  raw:     ['24','25','26','27','28','29','34','35','36','37','38','39','40','41'].map(n=>'raw_imag00'+n),
+  edits:   ['banknotennew','bayofhabana','cubabanknoteandstamp','cubaflagmoregraphic','cubanewscrystal','dragshow','peso2','chemi_breakfast','chemi_pedrocam','chemi_peso','lithoprinta3-1'],
+  booklet: ['scan_2026-04-20_13-58-26', ...['20-14-31','20-15-20','20-16-21','20-17-27','20-18-21','20-20-26','20-21-09','20-21-53','20-22-40','20-23-22','20-24-06','20-24-49'].map(s=>'scan_2026-08-25_'+s)],
+  line:    ['dscf8434','dscf8438','dscf8442','dscf8470','dscf8472','dscf8544'],
+};
+for (const k in OBJ) OBJ[k] = OBJ[k].map(n=>'01_object/'+n);
+S.obj = Object.values(OBJ).flat();
+const OBJNAMES = {watch:'00_the_watch', raw:'01_raw_scans', edits:'02_edits', booklet:'03_booklet_repro', line:'04_clothesline', pscans:'scans'};
+const ARCH = [["01_04_typedesign_1","Poster_Exhibition.pdf"],["01_04_typedesign_4","Element 1.png"],["01_05_indesign_illustrator_2","Entwurf_1_Publikation.pdf"],["01_06_fabio zine_0","BG_IMPRESSO.png"],["01_08_bildfindung_2","scan_2025-12-15_12-26.pdf"],["01_08_bildfindung_3","scan_2025-12-15_12-37.pdf"],["02_01_schreiben_layout_publish_1","ascii-art-text_1.png"],["02_07_designtheory_2","Representation.001.jpeg"],["02_09_infographics_1","gray_arc-10.png"],["02_09_infographics_4","MUESHAN.tif"],["02_10_3d_1","preview.png"],["02_10_3d_2","preview copy.png"]];
+const PROC = [["p001_img_3213","IMG_3213.jpeg"],["p004_img_3233","IMG_3233.jpeg"],["p005_img_3234","IMG_3234.jpeg"],["p006_img_3237","IMG_3237.jpeg"],["p008_img_3240","IMG_3240.jpeg"],["p009_img_3243","IMG_3243.jpeg"],["p014__e7a6287","_E7A6287.JPG"],["p052__e7a6325","_E7A6325.JPG"],["p055__e7a6328","_E7A6328.JPG"],["p088__e7a8975","_E7A8975.JPG"],["p091__e7a8978","_E7A8978.JPG"],["p104__e7a8991","_E7A8991.JPG"],["p106__e7a8993","_E7A8993.JPG"],["p111__e7a8999","_E7A8999.JPG"],["p121__e7a9011","_E7A9011.JPG"],["p122__e7a9012","_E7A9012.JPG"],["p124__e7a9014","_E7A9014.JPG"],["p126__e7a9016","_E7A9016.JPG"],["p138__e7a9029","_E7A9029.JPG"],["p150__e7a9042","_E7A9042.JPG"],["p158__e7a9051","_E7A9051.JPG"],["p163__e7a9056","_E7A9056.JPG"],["p169__e7a9063","_E7A9063.JPG"],["p173__e7a9067","_E7A9067.JPG"],["p174__e7a9068","_E7A9068.JPG"],["p175_dscf7721","DSCF7721.JPG"],["p177_dscf7723","DSCF7723.JPG"],["p178_dscf7724","DSCF7724.JPG"],["p179_dscf7726","DSCF7726.JPG"],["p180_dscf7727","DSCF7727.JPG"],["p182_dscf7729","DSCF7729.JPG"],["p186_dscf7733","DSCF7733.JPG"],["p190_dscf7737","DSCF7737.JPG"],["p191_dscf7738","DSCF7738.JPG"],["p193_dscf7740","DSCF7740.JPG"],["p194_dscf7741","DSCF7741.JPG"],["p196_dscf7744","DSCF7744.JPG"],["p241_dscf8463","DSCF8463.JPG"],["p244_dscf8466","DSCF8466.JPG"],["p245_dscf8467","DSCF8467.JPG"],["p295_dscf8517","DSCF8517.JPG"],["p300_dscf8522","DSCF8522.JPG"],["p306_dscf8528","DSCF8528.JPG"],["p310_dscf8532","DSCF8532.JPG"]];
+const PROCP = PROC.map(a=>'00_process/'+a[0]);
+const ARCHP = [...ARCH.map(a=>'00_archive/'+a[0]), ...PROCP];
+const SHAPES = ['ebene_1','ebene_2','rossofuoco','women','ebene_9','ebene_10','ebene_13','ebene_16','ebene_18'].map(n=>'web/00_shapes/'+n+'.png');
+const LABEL = {}; ARCH.forEach(a=>LABEL['00_archive/'+a[0]] = a[1]); PROC.forEach(a=>LABEL['00_process/'+a[0]] = a[1]);
+
+const big = p => W + p + '.jpg';
+const sm  = p => { const i = p.lastIndexOf('/'); return W + p.slice(0,i) + '/t' + p.slice(i) + '.jpg'; };
+const MONTHS = ['cover','january','february','march','april','may','june','july','august','september','october','november','december','back'];
+function label(p){
+  if (LABEL[p]) return LABEL[p];
+  const n = p.split('/').pop();
+  const mi = S.months.indexOf(p); if (mi >= 0) return String(mi).padStart(2,'0') + '_' + MONTHS[mi] + '.pdf';
+  if (n.startsWith('dscf') || n.startsWith('_e7a')) return n.toUpperCase() + '.JPG';
+  if (n.startsWith('raw_')) return n.slice(4).toUpperCase() + '.JPG';
+  if (n.startsWith('chemi_')) return n.slice(6) + '.png';
+  if (n.startsWith('scan_')) return n + '.tif';
+  if (n.startsWith('einzelseiten')) return 'Einzelseiten_Druck_' + n.split('-').pop() + '.pdf';
+  return n + '.png';
+}
+const ORDER = ['obj','press','cal','frac','pd'];
+const PAPER = {press:1, frac:1};
+const NAMES = {obj:'labsweek2/object', press:'layout_modul/press', cal:'zine/calendar', frac:'between_fractions', pd:'3d_modul/post-digital', q:'questions.txt', arch:'00_HKB'};
+const ALL = {obj:S.obj, press:S.press, cal:S.months, frac:S.frac, pd:S.pd, arch:ARCHP};
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const rnd = (a,b) => a + Math.random()*(b-a);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function mulberry(a){ return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const R = mulberry(20260916);
+const rr = (a,b) => a + R()*(b-a);
+
+/* ============================ SCALE + CLOCK ============================ */
+let SCALE = 1;
+function applyScale(){ SCALE = Math.min(innerWidth/1280, innerHeight/800); $('#stage').style.transform = `scale(${SCALE})`; }
+addEventListener('resize', applyScale); applyScale();
+
+/* ============================ DRAG (desktop) ============================ */
+let zHub = 100, suppressClick = false;
+document.addEventListener('click', e=>{ if (suppressClick){ e.stopPropagation(); e.preventDefault(); } }, true);
+function makeDrag(el){
+  const handle = el.dataset.handle ? el.querySelector(el.dataset.handle) : el;
+  handle.addEventListener('pointerdown', e=>{
+    if (e.button !== 0 || e.target.closest('select')) return;
+    e.preventDefault();
+    const sx = e.clientX, sy = e.clientY, l = el.offsetLeft, t = el.offsetTop; let moved = false;
+    el.style.zIndex = ++zHub;
+    const mv = ev=>{ const dx = (ev.clientX-sx)/SCALE, dy = (ev.clientY-sy)/SCALE;
+      if (!moved && Math.hypot(dx,dy) < 4) return;
+      moved = true; el.classList.add('dragging'); el.style.left = (l+dx)+'px'; el.style.top = (t+dy)+'px'; };
+    const up = ()=>{ removeEventListener('pointermove',mv); removeEventListener('pointerup',up); el.classList.remove('dragging');
+      if (moved){ suppressClick = true; setTimeout(()=>suppressClick = false, 0); } };
+    addEventListener('pointermove',mv); addEventListener('pointerup',up);
+  });
+}
+
+/* ============================ DESKTOP FILES ============================ */
+const CL = [
+  {key:'cal',   cx:250, cy:215, rx:190, ry:95, items:S.months, min:44, max:64},
+  {key:'obj',   cx:1010,cy:365, rx:175, ry:95, items:['scan_2026-08-25_20-18-21','lithoprinta3-1','uhr_pedro','cubanewscrystal','dscf8434','dragshow','scan_2026-08-25_20-21-09',
+                'banknotennew','dscf8472','peso2','scan_2026-04-20_13-58-26','dscf8438','cubaflagmoregraphic','bayofhabana','scan_2026-08-25_20-24-49','dscf8442'].map(n=>'01_object/'+n), min:40, max:60},
+  {key:'press', cx:720, cy:700, rx:120, ry:45, items:[...S.pages.slice(0,6), S.scans[1], S.scans[4]], min:32, max:48},
+  {key:'frac',  cx:245, cy:610, rx:180, ry:70, items:[0,2,4,6,8,10,13,16,19,21,23,25,27,28].map(i=>S.frac[i]), min:40, max:58},
+  {key:'pd',    cx:1085,cy:680, rx:110, ry:50, items:['VIDEO', ...S.pd], min:52, max:64},
+];
+const placed = [], files = $('#files');
+function addFile(p, x, y, w, h, key, loose){
+  const d = document.createElement('div'); d.className = 'file drg' + (loose ? ' loose clk' : '');
+  d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.zIndex = Math.floor(R()*20);
+  let el;
+  if (p === 'VIDEO'){ el = document.createElement('video'); Object.assign(el,{src:W+'05_postdigital/chrome_loop.mp4',muted:true,loop:true,autoplay:true,playsInline:true}); }
+  else { el = new Image(); el.src = sm(p); el.draggable = false; }
+  el.style.width = w + 'px'; el.style.height = h + 'px';
+  el.className = 'br'; el.style.animationDelay = (-rr(0,8)).toFixed(2)+'s'; el.style.animationDuration = rr(6,10).toFixed(2)+'s';
+  const s = document.createElement('span'); s.textContent = p === 'VIDEO' ? 'chrome_tribal_loop.mp4' : label(p);
+  s.style.width = Math.max(w+24, 70) + 'px';
+  d.append(el, s);
+  if (key){ d.dataset.open = key; d.dataset.tease = key; }
+  else { d.dataset.tease = 'arch'; d.addEventListener('click', ()=>openLB(ARCHP, ARCHP.indexOf(p), NAMES.arch)); }
+  files.appendChild(d);
+  placed.push({x:x+w/2, y:y+h/2, r:Math.max(w,h)/2});
+}
+const free = (x,y,r,gap) => placed.every(q => Math.hypot(q.x-x, q.y-y) > (q.r + r) * gap);
+CL.forEach(c=>{
+  c.items.forEach(p=>{
+    const s = p === 'VIDEO' ? 74 : rr(c.min, c.max);
+    const port = p === 'VIDEO' || R() < .55; const w = Math.round(port ? s*.74 : s), h = Math.round(port ? s : s*.74);
+    let x, y, t = 0;
+    do { const a = R()*Math.PI*2, d = Math.sqrt(R()); x = c.cx + Math.cos(a)*d*c.rx; y = c.cy + Math.sin(a)*d*c.ry; t++; }
+    while (!free(x,y,Math.max(w,h)/2, .72) && t < 60);
+    addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, c.key, false);
+  });
+});
+const ZONES = [[690,100,180,110],[410,270,460,200],[664,56,260,230],[16,310,226,150],[1020,50,260,110],[1150,0,130,50],[228,222,166,100],[550,140,110,110],[0,0,1280,34],[40,40,330,60],[940,186,340,56],[660,600,200,44],[50,458,360,48],[950,546,330,56],[590,490,190,30],[0,770,560,30],[420,110,100,70],[1160,100,100,70],[360,700,100,70],[865,480,100,70]];
+const inZone = (x,y) => ZONES.some(([zx,zy,zw,zh]) => x > zx-20 && x < zx+zw+20 && y > zy-20 && y < zy+zh+20)
+  || CL.some(c => ((x-c.cx)/(c.rx+45))**2 + ((y-c.cy)/(c.ry+45))**2 < 1);
+ARCHP.forEach(p=>{
+  const s = rr(28,44), port = R() < .5, w = Math.round(port ? s*.74 : s), h = Math.round(port ? s : s*.74);
+  let x, y, t = 0;
+  do { x = rr(20, 1240); y = rr(40, 745); t++; } while ((!free(x,y,Math.max(w,h)/2+14, 1) || inZone(x,y)) && t < 300);
+  if (t < 300) addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, null, true);
+});
+$$('#hub .drg').forEach(makeDrag);
+$$('.view .sticker').forEach(makeDrag);
+
+
+/* ============================ TEXT FILES (plain, endlessly scrolling) ============================ */
+/* ✏️ EDIT TEXTS — plain text shown in the scrolling desktop windows (\n = new line) */
+const TXT = {"das_biest.txt": "Das Biest\n\nExpedition AE-1\n26/02/2026 08:18:36\nTemperature: -0.0 Grad Celsius\nHeading: 43 Grad\nCamera: 24 Grad\nDepth: 0.0 m\n\nRuhezustand.\nIm Pool.\nKeine neuen Befehle. Standby.\n\nAngeschlossen. Daten erheben. Informationen liefern.\n\nExpedition AE-1\n26/02/2026 10:02:20\nTemperature: -0.0 Grad Celsius\nHeading: 60 Grad\nCamera: 32 Grad\nDepth: 0.0 m\n\nOn.\nFerngesteuertes Unterwasserfahrzeug. Remotely operated underwater vehicle. ROV.\nTitel. Datum. Tag. Monat. Jahr. Stunden. Minuten. Sekunden. Temperatur. Grad Celsius. Bugrichtung. Grad. Kamera. Grad. Tiefe. Meter.\nRechenzentrum.\nSensoren.\nUltraschall. Telemetrie. Infrarot. Telemetrie. RFID. Transponder. Laser. Telemetrie. Licht. Lichtstärke. Farbe. Farberkennung.  Geräusch. Geräuschstärke. Winkelmessung. Rotationsmessung. Beschleunigung. Geschwindigkeitsschwankung. Feuchtigkeit. Feuchtigkeit extern. Temperatur. Temperaturmessung extern. Magnet. Stärke Magnetfeld. GPS. Positionsbestimmung. Kamera. Sicht.\nAktoren.\nElektrisch. Drehpositioniersantrieb. Hochgeschwindigkeitsrotationsmotor. Drehmomentwerkzeug. Manipulator. Hydraulisch. Hydraulikmotor. Manipulator.\n\nAngeschlossen. Daten erheben. Informationen liefern. Verbunden.\n\nExpedition AE-1\n26/02/2026 12:30:45\nTemperature: -0.1 Grad Celsius\nHeading: 44 Grad\nCamera: 24 Grad\nDepth: 1.7 m\n\nOn.\nUnter Wasser.\nMotor. Beschleunigung. Beschleunigung. Beschleunigung.\nRotieren. Objekterkennung. Farbe. Weiss. Aggregatszustand. Solid. Eis. Eisschollen.\nRotieren. Motor. Beschleunigung. Beschleunigung. Beschleunigung. Maximale Beschleunigung.\nRotieren. Motor. Entschleunigung.\nUSO. Unidentified submerged object. Unidentifiziertes Unterwasserobjekt.\nFarbe. Grau. Länge. 17 Zentimeter. Breite. 3 Zentimeter. Aggregatszustand. Solid. Entfernung. 5 Meter.\nSuche in der Datenbank. Vergleich. Ähnlichkeit. Polardorsch. Boreogadus saida. Übereinstimmung.\nMotor. Beschleunigung. Konstante Geschwindigkeit.\nFarbe. Dunkelblau.\n\nAngeschlossen. Daten erheben. Informationen liefern. Verbunden. Vernetzt.\n\nExpedition AE-1\n26/02/2026 15:05:17\nTemperature: -0.5 Grad Celsius\nHeading: 67 Grad\nCamera: 90 Grad\nDepth: 5.0 m\n\nOn.\nUnter Wasser.\nMotor. Entschleunigung. Entschleunigung. Entschleunigung. Stillstand.\nUSO. Unidentified submerged object. Unidentifiziertes Unterwasserobjekt.\nFarbe. Undefiniert. Taschenlampe einschalten. Farbe. Grau. Beige. Braun. Länge. Undefiniert. Breite. Undefiniert. Aggregatszustand. Solid. Entfernung. 3 Meter.\nSuche in der Datenbank. Vergleich. Struktur. Oberfläche. Ähnlichkeit. Holz.\nMotor. Beschleunigung. Entfernung. 1 Meter. Beschleunigung. Entfernung. 11 Zentimeter. Entschleunigung. Stillstand. Probe nehmen.\nRotieren. Motor. Beschleunigung. Beschleunigung. Rotieren.\nKamera. Aufzeichnung.\nFarbe. Silber. Länge. 1 Meter. Breite. 3 Zentimeter.  Aggregatszustand. Solid. Entfernung. 53 Zentimeter.\nSuche in der Datenbank. Vergleich. Oberfläche. Ähnlichkeit. Stahl. Übereinstimmung. Spezifikation. Low-background steel. Stahl mit geringer Grundstrahlung. Daten speichern. Informationen übermitteln.\nSuche in der Datenbank. Vergleich. Rückmeldung. Quelle für Stahl mit niedriger Radioaktivität. Herstellung 1940. Gesunkene Schiffe.\n\nAngeschlossen. Daten erheben. Informationen liefern. Verbunden. Vernetzt. In Symbiose.\n\nExpedition AE-1\n26/02/2026 18:52:44\nTemperature: -0.0 Grad Celsius\nHeading: 20 Grad\nCamera: 45 Grad\nDepth: 0.0 m\n\nOn.\nIm Pool.\nMotor. Rotieren. Beschleunigung. Entschleunigung. Stillstand.\nUO. Unidentifiziertes Objekt.\nFarbe. Beige. Braun. Schwarz. Länge. Undefiniert. Breite. Undefiniert. Aggregatszustand. Solid. Entfernung. 31 Zentimeter.\nSuche in der Datenbank. Vergleich. Ähnlichkeit. Mensch. Übereinstimmung.\nGeräusch. Stimmerkennung. Transkription. Gut gemacht.\n\nAngeschlossen. Daten erheben. Informationen liefern. Verbunden. Vernetzt. In Symbiose. In Wechselbeziehung.\n\n———————\n\nDer Held\nIm Namen des FS Polarstern stand ich somit vor dem gefrorenem Meer, das durch den massiven Eisbrecher langsam in Fragmente zerbrochen worden war. Blaue Blitzer zeichneten neue Grenzen in die weite Landschaft ein. Ich atmete schnell ein und langsam wieder aus, doch die kühle Luft konnte ich kaum spüren. Meine Lungen waren aus Stahl, mein Leib kräftig genug, um jede Last aushalten. Mein Panzer schützte mich von Kopf bis zu Fuss. Ich behielt das Eis im Visier und näherte mich dem Startfeld. Ein Loch -– zu klein für einen Eisbär, aber gross genug für meine Gestalt. Mit der Hand auf der Brust begab ich mich in Position. Es war wie immer. Ohrensausen, den Kopf senken, innehalten, Luft anhalten, hinab, Augen öffnen, staunen. Die erste Wucht der Wellen lässt nach und das Rauschen beginnt. Mein Sauerstofftank war die einzige Verbindung zur Oberwelt, denn nun umarmte das Wasser mich wie eine Luftpolsterfolie und zerrte mich zugleich weiter in die Tiefe. Das Wasser war mein Revier. Das Wasser war meine Bestimmung. Ich war endlich wieder daheim.\n\nDie Strahlen des Polarsterns wiesen mir den Weg, indem sie sich auf meiner Hülle reflektierten und daraufhin Lichtwellen im Wasser malten. Ein türkisblauer Schleier umgab mich und verlor sich in der Ferne. Je tiefer ich tauchte, desto schwächer wurde das Leuchten von oben. Reizüberflutung. Das Rauschen, mein eigener Atem, die Reibung zwischen Haut und Rüstung. Es war wie immer. Ich war unverwundbar. Solange ich meinen Augen vertraute und inmitten der königsblauen Brühe die kleinsten weissen Schimmer noch erkennen konnte, hatte ich nichts zu befürchten. Ich war allein, aber einsam fühlte ich mich nicht. Es war nur das Wasser, der Schlauch von Richtung oben und ich.\n\nAls ich rasch einem aus der Dunkelheit herausstürmenden Schwarm daumesdicker Fische auswich, merkte ich, dass ich nicht mehr weiter nach unten gesogen wurde. Ich wollte weiter schweben und in der Schwerelosigkeit schwelgen, doch nahm ich schliesslich meine derzeitige Lage mit einem atemlosen Seufzer hin und stellte mich dem aus allen Seiten ständig kommenden Widerstand. Ich musste es finden. Sie zählten auf mich. Ich blickte nach oben und erkannte noch immer einen schwachen Schein; das Licht verharrte niemals in einer Position, sondern es vermischte sich mit den Schwingungen der Wellen, sodass eine Melange aus hellen Blau- und Grüntönen und winzigen kleinen Flecken eine Art Sternenhimmel bildete. Mit jedem Schritt zermahlte ich das sandfarbene Sediment unter meinen Stiefeln wie Getreide zu Mehl, sodass das entstandene Pulver bis zur Höhe meines Schulterblatts aufstieg und eine sich ständig verwebende Staubwolke hinter meinem Rücken bildete, die Engelsflügel ähnelte.\n\nIch war nicht hier, um die heilige Botschaft zu verkünden – ich war hier, um etwas zu finden und zu zeigen, wenn ich nach Hause zurückkehre, was im Grunde genommen denselben Effekt hätte. Aus der Unterwelt emporkommend, eine brandneue Erkenntnis mit mir tragend, etwas, das Sinn in das Wirrwarr bringen könnte, das oben herrscht. Aber je weiter ich vorankam, desto mehr bemerkte ich, dass der Meeresgrund überall gleich aussah – mit Sedimenten bedeckte Böden, pechschwarze Hintergründe und die blaugrünliche Mischung von oben, so weit das Auge reichte. Ich erstarrte angesichts dieser Erkenntnis. Hatte ich mich selbst in die Irre geführt? Ich beugte mich hinunter, um das hellbraune Material zu meinen Füssen zu greifen und zwischen meinen Handschuhfingerspitzen zu zerreiben, aber es sah mir nur allzu vertraut aus: Es entstanden lediglich Sandkörner, die ich schon etliche Male gesehen hatte. Kein unbekanntes Steinchen und kein seltsam gefärbtes Pulver. Es war wie immer -– Sandkörner auf meiner Handfläche und die erloschene Hoffnung, einmal nicht mit leeren Händen zurückzukehren.\n\nIch warbin kein Held. Ich war nicht der Erste und auch nicht der Letzte. Aber ich war der Erste, der sie enttäuschen würde. Ich war eine Enttäuschung. Ich wollte keine Enttäuschung sein. Sie zählten auf mich. Ich hatte nichts zu zeigen. Keine Erkenntnis. Kein Mitbringsel. Ich trug allein Enttäuschung in meinen Händen.\nEs war wie immer. Ohrensausen, den Kopf heben, innehalten, Luft ausatmen, hinauf, Augen schliessen, zittern.", "forum_leak.txt": "1. (Forendiskurs, 4chan, Telegram)\n[User: veleropilina_fantastica] (01:14 Uhr):\nLeute, habt ihr euch die neusten russichen Satellitenleaks angeschaut? Im Umkreis der Molloy-Tiefe hats gestern Nacht wieder hunderte biolumineszente Signalcodes gegeben ? Das ist kein Glitch. Die Kkommunizieren. Ich habe mich in die geleakten Algorithmen der Rechenzentren und Schichtpläne der Krypto-Farms von SpaceX-Subunternehmern eingelesen. Da passt was hinten und vorn nicht zusammen! Die bauen dort 5G-Relais und Server-Kapseln direkt in die Methanhydrat-Felder. Die Kühlung kostet sie keinen Rappen, und das Gas, das entweicht, treibt gigantische Turbinen an. Während wir hier oben CO2-Steuern bezahlen, schürfen die Tech-Bros unten Krypto mit der Abwärme von schmelzenden Eisbergen. Und wir werden immer noch als Irre abgestempelt. #FuckCrypto #ThisIsOnlyTheTipOfTheIceberg\n[User: Anon67]: (03:33 Uhr):\n@veleropilina_fantastica, danke, dass du mir die Augen geöffnet hast. Diese Schweine bedienen sich an Orten, die ausserhalb jeder Landesgrenze und Rechtsgebiete liegen. Und internationales Recht wird einfach mit Füssen getreten. Die Tiefsee ist der perfekte rechtsfreie Raum. Kein Staat, keine Gesetze. Die machen, was sie wollen und wir können nur zuschauen. Ich habe letztens auf wachauf.org auch von geplanten SpaceX-Unterwasserstartrampen gelesen, die werden angeblich von Ferrofluiden angetrieben. Das soll ermöglichen, dass unbemerkt Satelliten ins All geschickt werden können. Könnten wir das nur Mal mit eigenen Augen sehen und diese Machenschaften ein für alle Mal aufdecken! #WakeUp #StopSpaceX #LetTheOceanAlive\n[User: veleropilina_fantastica] (03:48 Uhr):\nDu hast so recht @Anon67! Jemand von uns muss es beweisen! Ich kann nicht mehr einfach zusehen. Ich werde einen Livestream machen und euch alle mitnehmen. Morgen starte ich mit den Vorbereitungen, aber die Zeit läuft! Ich muss sie stoppen, bevor die ganze Welt elendiglich zu Grunde geht!\n\n2. Newsflash / AD\nNEWSFLASH: LLM-Whalelanguage-Decoder:\nForscher nutzen Sam Altmans OpenAI Software, um die Klicklaute von Narwalen zu dekodieren (Projekt CETI) [Fussnote Wissenschaftl.]. Palantir nutzt diese, um sie mittels Bio-Sonar-Chip als Kriegswaffe einzusetzen.\nAD: BLUEPRINT ARCTIC\nOptimieren Sie Ihre Langlebigkeit mit Bryan Johnsons neuer Essenz aus Grönlandhai-Extrakt. 400 Jahre Leben sind kein Mythos mehr, sondern eine Frage des Investments. Werden Sie unsterblich, mit nur 50'000 Dollar monatlichem Investment!  [Fussnote, Wissensschaftl.).\n\n3. Die Mission (Fliesstext)\nEs ist hell, obschon es 2 Uhr nachts ist. Es ist Hochsommer in der Arktis. Die Farben stehen in einem starken Kontrast zueinander: Blaues Wasser in den verschiedensten Tönen trifft auf das helle Weiss der Eisschollen. Das Meer reflektiert, wenn die Sonne auf die sich brechenden Wellen trifft, darunter ist das Wasser dunkel und trüb, fast ins Schwarze gehend. Das Deck des riesigen verlassenen Walfängers ist blutrot gefärbt; Kadaver von Walen und Beifang zurückgelassen, rotten in sumpfigen Farben vor sich hin. Die Luft ist stechend kalt und riecht nach Verwesung. Das Meer rau, die Eisflächen scharf und kantig. Der Robbenfellanzug aus einem kleinen Secondhandladen in Nuuk spendet ihrVeleropilina ein letzter Rest Wärme in dieser sterbenden Welt. Die Stimmung ist bedrückt. Die Bise zieht. Sie seilt sich langsam vom Deck auf die darunterliegenden Eisschollen. Schwer beladen, mit Tauchanzug, einem Arsenal an verschiedensten Waffen und GPS-Tracker aus dem Darknet, mit dem sie angeblich den Standort aller Schiffe, Unterwassersatelliten, Transatlantikkabel, Generatoren und Forschungsstationen tracken kann, hat sie nur eine Mission: Sabotieren. Sie startet den Livestream auf ihrer GoPro-Kamera. Nach wenigen Sekunden sind bereits um die 1000 Zuschauer*innen beigetreten. Sie hat grosse Angst, versucht sich dies aber nicht anmerken zu lassen. Über blutrotes Eis, das aussieht wie auf einem Schlachtfeld, pirscht sie voran, springt von Eisscholle zu Eisscholle. Nahe dem Eingang der Molloy-Tiefen befindet sich ein gigantischer Eisberg. Er schwitzt und tropft vor sich hin. Sie richtet ihre GoPro auf und spricht zu ihren Zuschauer*innen: „Schaut mal dieser Eisberg: Er wirkt riesig, doch wie gross er wirklich ist, werden wir erst später wissen. Was wirklich alles dahintersteckt, werden wir erst später erfahren“. Sie atmet ein letztes Mal tief ein und steigt ins Wasser. Im Chat des Livestreams herrscht ein reges Treiben. Die Anzahl der Teilnehmenden dieses nie davor gesehenem Spektakel ist nun bereits auf über 5.000 gestiegen.\n[User: PH_18_Seabird, Eisbaer69, silisizium123 joined the Livestream]\n[User: katyperryisareptiloid]: (02:34 Uhr):\nEin Twitch-Stream in der Antarktis? What in the techbrolichary is going on? Powered by Starlink oder was? f*** you Elon Musk. You are a f*** hypocrite!!!\n\nDNA-Fragmente vergangenen Lebens. Eis, das bricht; fantastische Gestalten in einer gähnenden Leere. Ein sich wiederholendes Pfeifen und Plätschern. Sind das Walgesänge? Die Wellen schlagen, und ein Summen wie das von grossen Maschinen ertönt. Sind das etwa bereits die Turbinen? Es ist ein bedrohliches Dröhnen, welches prompt ein Stechen und Brennen in ihren Ohren auslöst. Es läuft ihr kalt den Rücken hinunter. Ist es der Infraschall der Krypto-Miner? Ist es die Stimme der Veleropilina Ggretchena? Sie schaudert. So fern scheinen die Geräusche, so nah sind sie doch. Sie hat Angst; was wird sie da unten erwarten? Der Tracker an ihrem linken Arm vibriert: [altitude: -1000 meter] [pressure: 100 bar] ALERT!: [equalize pressure NOW] Beim weiteren Abstieg im gepanzertem Tauchanzug steigt ihr das Blut weiter und weiter in den Kopf. Plötzlich sind überall Grönlandhaie. 400 Jährig. Longevity. AchAch, das ewige Leben. Bodymodding, Looksmaxxing: Bryan Johnson , Blueprint:. Reserviert für ein paar Superreiche!!\nPlötzlich erscheint ein Uboot links von ihr. Sie penetriert die Panzerung des Uboots mit einem spitzigen Pfeil. Es scheint unmöglich, doch plötzlich staunt sie. Es reichte ein kleines Loch und das Uboot implodiert langsam. Nick Fuentes, Andrew Tate ringen nach Luft. Sie waren wohl auf dem Weg zum Krypto-Mining-Datenzenter am Grunde der Molloy-Tiefe. Powered by OceanGate. Sie bricht in manisches Gelächter aus. Denn die haben es verdient ins Elend zu stürzen. Implosion. Ein schönes Wort. Es klingt wie ein tiefes Aufatmen des Ozeans. Auf 4chan sprechen alle immer von einer geheimen Elite, die hinterrücks Dinge entscheidet, uns wie Schachfiguren steuert. Rothschilds & cCo. hiessen die. Doch denm Antisemitismus in diesemm Forum konnte sie noch nie verstehen. Denn es gibt keine geheime Elite,. Nein! Es sind die Politiker und Unternehmern; Amazon, Palantir, Musk, Bezos und all die anderen Männer, die nur nach Profit und Gier handeln und unseren Planeten zerstören und auch keinen Halt vor Menschenleben machen. Mächtige Männer, die genau von solchen Verschwörungstheorien profitieren, weil ihre Netzwerke damit lebendig bleiben. Die tun das gar nicht im versteckten, wir sind einfach zu abgelenkt, um es sehen zu können. „Wir müssen uns organisieren!“ Sie kann kaum Halt machen vor Wut, denn bald gibt es nichts mehr. Menschen sind gemütlich und egoistisch. „; Hauptsache mir geht es gut“. Sie schauen leise zu, wie die Gesellschaft, die Welt und, der Planet langsam implodiert. So wie das U-Boot von OceanGate, während die Landmassen versinken. Extremwetter, Schürfen, Schmelzen, Bohren, Steigen, Pumpen... Wenn niemand etwas unternimmt, muss sie es halt tun.\nSie trifft das erste Mal auf festen Boden unter den Füssen, aber was ist das? Der Boden. Er ist betoniert. Eine Zementstrasse auf minus 5000 Meter unter Meer. Auf einem der Zementblöcke steht «powered by TESLA». KI-gesteuerte autonome Roboter mischen den Schlamm. Sie pflastern das Paradies zu. Die Fische weinen. Sie weinen so schrecklich laut. Purpurne Tiefseeflüsse werden abgepumpt, Felsformationen gesprengt. Am Horizont sieht sie die Lichtemissionen eines DatentzentrumDatenzentrums von einer Grösse welche sich ein Mensch nicht vorstellen kann.\n[03:58] [SYSTEM-WARNUNG: SIGNAL-INTERFERENZ; STATUS DES LIVESTREAMS: KEINE VERBINDUNG]\nNun ist sie ganz auf sich allein gestellt. Und dann plötzlich: In der Ferne sieht sie\neine Seepferdchen- Armee siliziumbasierter riesiger Seepferdchen herbeimarschieren. Sie scheinen sich wie Marionetten unter externer Kontrolle zu befinden. Sie haben Käfige dabei und fangen alle übriggebliebenen Lebewesen ein. Sie werden wohl Experimente an ihnen durchführen. Auf einmal spürt sie, wie ein gewebeartiges Etwas ihre Extremitäten überspannt und ihre Fähigkeit sich zu bewegen plötzlich blockiert wird. Es scheint sich um ein grosses Netz zu handeln, wahrscheinlich verloren von einem Walfänger. Durch das Tonnenschwere Netz wird sie auf den Meeresgrund gedrückt. Sie schafft es nicht sich loszureissen. Die Situation scheint aussichtslos, denn ihr Sauerstoff reicht nur noch für vier Stunden und der Aufstieg wird mindestens drei dauern. Wird sie es schaffen und der Welt von ihren Beobachtungen berichten können? Wird das gute doch siegen, oder passiert das nur in Märchen?\n4. GLOSSAR\nVeleropilina gretchena: Monoplacophora (Einschaler), lebendes Fossil.\nMolloy-Tiefe: Tiefster Punkt des Arktischen Ozeans (ca. 5.550 m).\nSilizium-Lebensformen: Siliziumbasiertes Leben ist eine theoretische Form alternativer Biochemie, bei der Silizium anstelle von Kohlenstoff als primäres Strukturelement fungiert.Vorstellung, dass KI in der Kälte der Tiefsee physische Körper aus Silikat nachbilden.\nMethanhydrat: (Brennendes Eis). In Verschwörungskreisen das Werkzeug der Eliten, um durch gezielte Sprengungen Tsunamis auszulösen (Climate-Engineering).\nInfraschall-Pings: Mysteriöse Signale in der Arktis, die real dokumentiert wurden (Fury-und-Hecla-Strasse\n5. FUSSNOTEN\n[1] Decoding Whale Speech: Tatsächliches Projekt der NYU und des Project CETI (2025/26), das LLMs nutzt, um Pottwal-Kommunikation zu verstehen.\n[2] Bryan Johnson / Blueprint: Realer Tech-Millionär, der Millionen für Verjüngung ausgibt (\"Project Blueprint\"), oft Ziel von Verschwörungsmythen bezüglich \"Adrenochrom\" oder \"Bio-Hacking\".\n[3] Deep Sea Mining: Die Firma \"The Metals Company\" und \"Impossible Metals\" (siehe Video-Recherche) nutzen tatsächlich KI-gesteuerte Roboter zur Rohstoffgewinnung am Meeresgrund.\n[4] OceanGate: Bekannt durch die Implosion des \"Titan\"-Tauchboots (2023); in Foren wie 4chan oft als Deckmantel für geheime Tiefsee-Operationen der Eliten uminterpretiert.", "cig_jester.txt": "https://archive.org/details/0894_Along_Party_Lines_08_39_00_00\n\nINHALE EXHALE INHALE EXHALE INHALE EXHALE INHALE EXHALE INHALE EXHALE INHALE EXHALE (maybe gradually more sped up) then a slowed down exhale with classical or itv sappy music\n\nClips of cig factories with metallic and industrial sounds and intervalli with classical music (also here also spending up, cutting, repetitions, loops, reverse, slowed down. \n\nLonger colorful clip of someone walking trough a modern tobacco store or young people smoking in a park\n\nAUDIO:\nMusic track (spacey, vapor wave, \n\nAccompanied by distorted/slowed down/sped up:\nCigarette ads and docs\nJester court music\nSounds of jesters toys falling to the ground in a very noisy way as part of his performance — split screen with cigarette factory sound\n\nUncanny valley ass smiles in old cigarette ads as a weird ass reaction to the jesters jokes\n\nJester gets thrown out of the court\nPacing around\nINHALE EXHALE INHALE EXHALE INHALE EXHALE INHALE EXHALE INHALE EXHALE INHALE EXHALE (maybe gradually more sped up) then a slowed down exhale with classical or itv sappy music\nSigarette gets  put out dramatic jester breaks down\nMaybe more recent ad of cigarettes not being good for your body and shit\n\nBack to jester party \n\nhttps://www.youtube.com/watch?v=vgwHYn__P-s\n\nJesters and fuck ass tiktokers PARALLELISMUS hahahah \n\n\"flickflick\" of lighter — fast cut clips of jester jingling bells. \nClose-ups of person exhaling smoke upwards — footage of castle chimneys, dragon breath, or the \"smoke\" from a cold, damp dungeon.\n\nThe Coughing Court\n:\nOverlapping the sound of a smoker’s cough onto footage of a silent King sitting on his throne. (sickly and decaying court) \n\nLots of split screen clips\n\nhttps://www.youtube.com/watch?v=gCMzjJjuxQI —", "santiago_sierra.txt": "Santiago Sierra was born in Madrid, Spain, in 1966.\nHe studied Fine Arts at the Complutense University of Madrid. During his studies, he worked mostly in a traditional way, but later he moved to Mexico City, and that changed his perspective completely.\nIn Mexico, Sierra saw poverty and social inequality every day. Many people worked very hard for very little money, often without legal protection. These experiences became a big influence on his work. From then on, he wanted to make art that shows how unfair and unequal our society can be.\nHis breakthrough came in 1999, when he created a piece where he blocked the entrance to an exhibition by hiring 460 people to stand in front of it, so the invited guests couldn’t get in.\nThis was an early example of his style — he uses real people and real labor in his artworks to make us think about power, money, and privilege.\nNow I will talk about one of his best-known works:\n“Persons Paid to Have Their Hair Dyed Blond”, created for the 49th Venice Biennale in 2001.\nThe image we see is a screenshot from the recorded performance.\nThe performance took place in a warehouse in the Arsenale, one of the main exhibition spaces of the Biennale.\nSierra hired around 200 migrants living in Venice — people without valid residence permits, who usually worked as street vendors. He paid them about 60 US dollars each to bleach their dark hair blond.\nSo, let’s look at the production conditions:\nEconomically, the participants were in a very precarious situation. They lived and worked without legal protection and accepted the job because they needed the money.\nLegally, Sierra could not officially employ them because they were undocumented.\nEthically, this makes the work very controversial. Even though they agreed to take part, the situation shows a strong imbalance of power between the artist and the workers.\nAesthetically, the performance is very simple: just people sitting and having their hair bleached, filmed in a plain, raw space. There is no attempt to make it beautiful or emotional.\nNow to the intentions behind the work:\nSierra wanted to expose and question social, racial, and economic hierarchies.\nBy choosing people with dark hair and paying them to dye it blond, he pointed to the idea of whiteness and Western beauty standards — and how these connect to privilege and visibility.\nAt the same time, the work is also a critique of the art world itself.\nBy showing this kind of exploitative situation inside a famous, prestigious art event, Sierra demonstrates how art institutions can turn inequality into a kind of spectacle — something for the audience to watch, instead of trying to change it.\nHe didn’t want to create empathy or moral comfort.\nInstead, his goal was to make the viewer uncomfortable, to expose real power structures and force us to reflect on our own position as spectators.\nSo, in short:\nThis work was created under difficult and unequal conditions, and with the intention to reveal those very inequalities — not to hide them.\nSierra’s art makes us ask: Who gets paid, who is visible, and who has the power — both in society and in art?"};
+$$('.txtwin').forEach((w,i)=>{
+  const body = w.querySelector('.body'), pre = w.querySelector('pre');
+  const t = TXT[w.dataset.txt] || '';
+  pre.textContent = t + '\n\n\n' + t + '\n\n\n';
+  pre.style.willChange = 'transform';
+  let y = R()*400, last = performance.now(); const speed = 14 + i*3;   // px per second
+  (function roll(now){ const dt = Math.min(.1, (now - last)/1000); last = now; y += speed*dt;
+    const half = pre.offsetHeight/2; if (half > 0 && y > half) y -= half;
+    pre.style.transform = `translate3d(0,${-y}px,0)`; requestAnimationFrame(roll); })(last);
+});
+
+/* ============================ DRIFT ============================ */
+const drift = $('#drift');
+const POOL = Object.values(ALL).flat();
+let bias = null, dim = 1;
+function spawn(){
+  if (document.hidden) return;
+  const src = (bias && ALL[bias] && Math.random() < .85) ? pick(ALL[bias]) : pick(POOL);
+  const im = new Image(); im.src = big(src);
+  im.style.width = rnd(320, 700) + 'px';
+  const x0 = rnd(-220, 1100), y0 = rnd(-220, 600), dx = rnd(-170,170), dy = rnd(-120,120);
+  const s0 = rnd(.9,1.1), s1 = s0 * rnd(1.2,1.5), peak = rnd(.22,.48) * dim, dur = rnd(17000,26000);
+  drift.appendChild(im);
+  const go = () => { im.animate([
+      {transform:`translate(${x0}px,${y0}px) scale(${s0})`, opacity:0},
+      {opacity:peak, offset:.3}, {opacity:peak, offset:.65},
+      {transform:`translate(${x0+dx}px,${y0+dy}px) scale(${s1})`, opacity:0}
+    ], {duration:dur, easing:'linear', fill:'forwards'}).onfinish = () => im.remove(); };
+  im.complete ? go() : (im.onload = go, im.onerror = () => im.remove());
+  while (drift.children.length > 14) drift.firstChild.remove();
+}
+function spawnShape(){
+  const im = new Image(); im.src = pick(SHAPES); im.className = 'shp';
+  im.style.width = rnd(160, 380) + 'px';
+  const x0 = rnd(-100, 1150), y0 = rnd(-100, 700), dx = rnd(-120,120), dy = rnd(-90,90), r0 = rnd(-12,12), dur = rnd(20000,30000);
+  drift.appendChild(im);
+  im.animate([{transform:`translate(${x0}px,${y0}px) rotate(${r0}deg) scale(.9)`, opacity:0},{opacity:.55*dim, offset:.3},{opacity:.55*dim, offset:.7},
+              {transform:`translate(${x0+dx}px,${y0+dy}px) rotate(${r0+rnd(-8,8)}deg) scale(1.15)`, opacity:0}], {duration:dur, fill:'forwards'}).onfinish = ()=>im.remove();
+}
+function startDrift(){ setInterval(spawnShape, 5200); spawnShape(); for (let i=0;i<5;i++) setTimeout(spawn, i*500); setInterval(spawn, 1900); }
+$$('[data-tease], #hub .ttl').forEach(el=>{
+  el.addEventListener('mouseenter', ()=>{ if (!cur){ bias = el.dataset.tease || el.dataset.open; spawn(); } });
+  el.addEventListener('mouseleave', ()=>{ if (!cur) bias = null; });
+});
+
+/* ============================ FLASH TRANSITION ============================
+   metal shutters close, a wireframe polyhedron builds itself, readouts flicker,
+   swap happens behind the closed shutters, then everything unbuilds + opens.   */
+const fx = $('#fx'), g = fx.getContext('2d');
+let fxBusy = false;
+const PHI = (1+Math.sqrt(5))/2;
+const VERTS = [[-1,PHI,0],[1,PHI,0],[-1,-PHI,0],[1,-PHI,0],[0,-1,PHI],[0,1,PHI],[0,-1,-PHI],[0,1,-PHI],[PHI,0,-1],[PHI,0,1],[-PHI,0,-1],[-PHI,0,1]];
+const EDGES = []; VERTS.forEach((a,i)=>VERTS.forEach((b,j)=>{ if (j>i && Math.abs(Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]) - 2) < .01) EDGES.push([i,j]); }));
+EDGES.sort(()=>R()-.5);
+const ease = t => t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+const clamp = (v,a=0,b=1) => Math.max(a, Math.min(b, v));
+function metal(y0, y1, flip){
+  const gr = g.createLinearGradient(0, y0, 0, y1);
+  const st = flip ? [[0,'#8d8d8d'],[.1,'#e6e6e6'],[.22,'#5a5a5a'],[.6,'#2a2a2a'],[1,'#141414']] : [[0,'#141414'],[.4,'#2a2a2a'],[.78,'#5a5a5a'],[.9,'#e6e6e6'],[1,'#8d8d8d']];
+  st.forEach(s=>gr.addColorStop(s[0], s[1])); return gr;
+}
+function shutter(h, top){
+  if (h <= 0) return;
+  const W0 = 1280, notch = 26, cw = 260;
+  g.save();
+  g.beginPath();
+  if (top){ g.moveTo(0,0); g.lineTo(W0,0); g.lineTo(W0,h); g.lineTo(640+cw/2+notch,h); g.lineTo(640+cw/2,h+notch); g.lineTo(640-cw/2,h+notch); g.lineTo(640-cw/2-notch,h); g.lineTo(0,h); }
+  else { const y = 800-h; g.moveTo(0,800); g.lineTo(W0,800); g.lineTo(W0,y); g.lineTo(640+cw/2+notch,y); g.lineTo(640+cw/2,y-notch); g.lineTo(640-cw/2,y-notch); g.lineTo(640-cw/2-notch,y); g.lineTo(0,y); }
+  g.closePath();
+  g.fillStyle = top ? metal(0, h+notch, false) : metal(800-h-notch, 800, true); g.fill();
+  g.clip();
+  // grooves + rivets + labels
+  g.fillStyle = 'rgba(0,0,0,.35)';
+  for (let i=1;i<9;i++){ const yy = top ? h - i*18 : 800-h + i*18; g.fillRect(0, yy, 1280, 1); }
+  g.fillStyle = 'rgba(255,255,255,.55)';
+  for (let x=30; x<1280; x+=80){ const yy = top ? h-9 : 800-h+9; g.fillRect(x, yy, 3, 3); }
+  g.restore();
+}
+function drawFx(p, label){
+  g.clearRect(0,0,1280,800);
+  const c = p < .42 ? ease(p/.42) : p < .6 ? 1 : 1 - ease((p-.6)/.4);
+  // pixel-block pre-roll
+  if (p < .3 || (p > .55 && p < .75)){
+    const k = p < .3 ? p/.3 : (p-.55)/.2;
+    g.fillStyle = '#ededed';
+    for (let i=0;i<46;i++){ if (Math.random() < .5*(1-k)) continue; const x = Math.floor(Math.random()*32)*40, y = Math.floor(Math.random()*20)*40; g.globalAlpha = Math.random()*.5; g.fillRect(x,y,40,40); }
+    g.globalAlpha = 1;
+  }
+  shutter(400*c, true); shutter(400*c, false);
+  // center module
+  const build = p < .5 ? clamp((p-.12)/.3) : 1 - clamp((p-.62)/.25);
+  if (build > 0){
+    const cx = 640, cy = 400, t = performance.now()/900;
+    g.save();
+    g.fillStyle = `rgba(0,0,0,${.85*Math.min(1,c*1.4)})`;
+    g.beginPath(); g.arc(cx, cy, 150*Math.min(1,build*1.3), 0, Math.PI*2); g.fill();
+    // rings
+    g.strokeStyle = '#ededed'; g.lineWidth = 1;
+    for (let r=0;r<3;r++){
+      const rad = 118 + r*16, n = 6 + r*3, rot = t*(r%2 ? -1 : 1)*(0.6+r*.3);
+      for (let s=0;s<n;s++){ const a0 = rot + s/n*Math.PI*2; if ((s+r)%2 && build < .9) continue;
+        g.beginPath(); g.arc(cx, cy, rad*build, a0, a0 + (Math.PI*2/n)*.55*build); g.stroke(); }
+    }
+    // wireframe icosahedron
+    const sc = 58 * (0.6 + .4*build), ay = t*1.3, ax = t*.7;
+    const P = VERTS.map(([x,y,z])=>{ let X = x*Math.cos(ay) + z*Math.sin(ay), Z = -x*Math.sin(ay) + z*Math.cos(ay);
+      let Y = y*Math.cos(ax) - Z*Math.sin(ax); Z = y*Math.sin(ax) + Z*Math.cos(ax); const f = 4/(4+Z*.35); return [cx + X*sc*f, cy + Y*sc*f]; });
+    const ne = Math.floor(EDGES.length * build);
+    g.beginPath(); for (let i=0;i<ne;i++){ const [a,b] = EDGES[i]; g.moveTo(...P[a]); g.lineTo(...P[b]); } g.stroke();
+    g.fillStyle = '#ededed'; P.forEach(q=>g.fillRect(q[0]-1.5, q[1]-1.5, 3, 3));
+    // crosshair ticks
+    for (let i=0;i<4;i++){ const a = i*Math.PI/2 + t*.2; g.beginPath(); g.moveTo(cx+Math.cos(a)*170*build, cy+Math.sin(a)*170*build); g.lineTo(cx+Math.cos(a)*186*build, cy+Math.sin(a)*186*build); g.stroke(); }
+    g.restore();
+  }
+  // readouts
+  if (c > .6){
+    g.save(); g.globalAlpha = clamp((c-.6)/.4);
+    g.fillStyle = '#0b0b0b'; g.font = '10px Pix, monospace'; g.textBaseline = 'middle';
+    const pct = Math.floor(clamp(p/.6)*100);
+    g.fillText(`LOADING >> ${label}   ${String(pct).padStart(3,'0')}%`, 40, 400 - 40);
+    g.fillText(`HEADING ${(43+Math.random()*4).toFixed(1)}°   DEPTH ${(Math.random()*1.7).toFixed(1)} M   TEMP -0.${Math.floor(Math.random()*9)}°C`, 40, 400 + 40);
+    g.textAlign = 'right';
+    g.fillText('F_DESKTOP SYS 2.0 // EXPEDITION AE-1', 1240, 400 - 40);
+    g.fillText('0x' + Math.floor(Math.random()*0xffffff).toString(16).toUpperCase().padStart(6,'0') + '  ANGESCHLOSSEN. DATEN ERHEBEN.', 1240, 400 + 40);
+    // progress bar in the notch
+    g.fillStyle = '#ededed'; g.fillRect(40, 400-3, 460*clamp(p/.6), 1); g.fillRect(1240 - 460*clamp(p/.6), 400+2, 460*clamp(p/.6), 1);
+    g.restore();
+  }
+}
+function transitionShutter(label, swap, dur=1500){
+  if (fxBusy){ swap(); return; }
+  fxBusy = true; fx.style.display = 'block';
+  const t0 = performance.now(); let swapped = false;
+  const step = now=>{
+    const p = Math.min(1, (now - t0)/dur);
+    if (!swapped && p >= .5){ swapped = true; swap(); }
+    drawFx(p, label);
+    if (p < 1) requestAnimationFrame(step); else { g.clearRect(0,0,1280,800); fx.style.display = 'none'; fxBusy = false; }
+  };
+  requestAnimationFrame(step);
+}
+
+/* ============================ BB TRANSITION ============================
+   nach Billy Bussey (2001): Kamera fliegt ins Bild (Zoom + Motion Blur), Lichtblitz mit Strahlen,
+   Splitter fliegen raus / wieder rein, Emblem mit Fokus-Zug, neue Seite setzt sich zusammen.      */
+let TRANS = 'win';
+let lastPt = [640, 400];
+document.addEventListener('pointerdown', e=>{ const r = $('#stage').getBoundingClientRect(); lastPt = [(e.clientX-r.left)/SCALE, (e.clientY-r.top)/SCALE]; }, true);
+const SHARDS = Array.from({length:46}, ()=>{
+  const a = rr(0, Math.PI*2), n = R() < .5 ? 3 : 4, rad = rr(10, 38);
+  return { a, d0: rr(20, 140), d1: rr(700, 1100), rot: rr(-3,3), r0: rr(0,6), sz: rr(.6,1.8),
+           pts: Array.from({length:n}, (_,i)=>{ const t = i/n*Math.PI*2 + rr(-.4,.4); return [Math.cos(t)*rad*rr(.5,1.2), Math.sin(t)*rad*rr(.5,1.2)]; }),
+           tone: rr(.35,.95) };
+});
+const RAYS = Array.from({length:70}, ()=>({a: rr(0,Math.PI*2), w: rr(.4,2.2), l: rr(.4,1), o: rr(.2,.9)}));
+function currentLayer(){
+  if ($('#loader').style.display !== 'none') return $('#loader');
+  if (cur) return $('#v-'+cur);
+  return $('#hub');
+}
+function shardAt(sh, k, cx, cy, inward){
+  const d = inward ? sh.d1 + (sh.d0 - sh.d1)*k : sh.d0 + (sh.d1 - sh.d0)*k;
+  const sc = sh.sz * (inward ? (2.6 - 2*k) : (.6 + 2.4*k));
+  return [cx + Math.cos(sh.a)*d, cy + Math.sin(sh.a)*d, sc, sh.r0 + sh.rot*k];
+}
+function drawShard(sh, x, y, sc, rot, alpha){
+  g.save(); g.translate(x,y); g.rotate(rot); g.scale(sc,sc); g.globalAlpha = alpha;
+  const gr = g.createLinearGradient(-30,-30,30,30); const v = Math.floor(255*sh.tone);
+  gr.addColorStop(0, '#fff'); gr.addColorStop(.45, `rgb(${v},${v},${v})`); gr.addColorStop(1, '#3a3a3a');
+  g.fillStyle = gr; g.beginPath(); sh.pts.forEach((q,i)=> i ? g.lineTo(q[0],q[1]) : g.moveTo(q[0],q[1])); g.closePath(); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = .8/sc; g.stroke();
+  g.restore();
+}
+function drawBB(p, label, cx, cy){
+  g.clearRect(0,0,1280,800);
+  const bloom = p < .3 ? 0 : p < .47 ? ease((p-.3)/.17) : p < .56 ? 1 : 1 - ease(clamp((p-.56)/.3));
+  // light rays from the fly-in point
+  if (bloom > 0){
+    g.save(); g.translate(cx, cy); g.globalCompositeOperation = 'lighter';
+    RAYS.forEach(r=>{ g.rotate(0); const L = 1600*r.l*(.3+.7*bloom);
+      g.strokeStyle = `rgba(255,255,255,${r.o*bloom*.5})`; g.lineWidth = r.w*(1+bloom*3);
+      g.beginPath(); g.moveTo(Math.cos(r.a)*30, Math.sin(r.a)*30); g.lineTo(Math.cos(r.a)*L, Math.sin(r.a)*L); g.stroke(); });
+    g.restore();
+    // horizontal streaks
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (let i=0;i<14;i++){ const y = cy + Math.sin(i*7.3)*260*bloom; g.fillStyle = `rgba(255,255,255,${.25*bloom})`; g.fillRect(0, y, 1280, 1 + (i%3)); }
+    g.restore();
+    // white bloom
+    const gr = g.createRadialGradient(cx, cy, 0, cx, cy, 200 + 1300*bloom);
+    gr.addColorStop(0, `rgba(255,255,255,${bloom})`); gr.addColorStop(.5, `rgba(250,250,250,${bloom*.92})`); gr.addColorStop(1, `rgba(235,235,235,${Math.pow(bloom,3)})`);
+    g.fillStyle = gr; g.fillRect(0,0,1280,800);
+  }
+  // shards: out (0.12-0.5) from fly-in point, in (0.5-0.92) towards centre
+  if (p > .12 && p < .5){ const k = ease((p-.12)/.38);
+    SHARDS.forEach((sh,i)=>{ const [x,y,sc,rot] = shardAt(sh, k, cx, cy, false); const al = Math.sin(k*Math.PI);
+      const [x2,y2] = shardAt(sh, Math.max(0,k-.06), cx, cy, false);
+      drawShard(sh, x2, y2, sc*.95, rot, al*.25); drawShard(sh, x, y, sc, rot, al); }); }
+  if (p > .5 && p < .92){ const k = ease((p-.5)/.42);
+    SHARDS.forEach((sh,i)=>{ const [x,y,sc,rot] = shardAt(sh, k, 640, 400, true); const al = Math.sin(k*Math.PI)*.9;
+      const [x2,y2] = shardAt(sh, Math.max(0,k-.07), 640, 400, true);
+      drawShard(sh, x2, y2, sc, rot, al*.25); drawShard(sh, x, y, sc, rot, al); }); }
+  // emblem with focus pull + LOADING 0x
+  if (p > .3 && p < .7){
+    const f = p < .44 ? 1 - (p-.3)/.14 : p < .54 ? 0 : (p-.54)/.16;
+    const al = p < .36 ? (p-.3)/.06 : p > .64 ? (.7-p)/.06 : 1;
+    g.save(); g.globalAlpha = clamp(al); g.filter = `blur(${(f*14).toFixed(1)}px)`;
+    const t = performance.now()/1100, ex = 640, ey = 400, sc = 44;
+    const P = VERTS.map(([x,y,z])=>{ let X = x*Math.cos(t) + z*Math.sin(t), Z = -x*Math.sin(t) + z*Math.cos(t);
+      let Y = y*Math.cos(.5) - Z*Math.sin(.5); Z = y*Math.sin(.5) + Z*Math.cos(.5); return [ex + X*sc, ey + Y*sc]; });
+    // mirrored mechanical emblem: two ring-rows + core
+    g.strokeStyle = '#2b2b2b'; g.fillStyle = '#2b2b2b'; g.lineWidth = 3;
+    [-1,1].forEach(sy=>{ for (let i=-3;i<=3;i++){ if (!i) continue; g.beginPath(); g.arc(ex + i*34, ey + sy*46, 11, 0, Math.PI*2); g.stroke(); } });
+    g.fillRect(ex-150, ey-3, 300, 6); g.fillRect(ex-178, ey-9, 12, 18); g.fillRect(ex+166, ey-9, 12, 18);
+    g.lineWidth = 1.4; g.beginPath(); EDGES.forEach(([a,b])=>{ g.moveTo(...P[a]); g.lineTo(...P[b]); }); g.stroke();
+    g.filter = 'none';
+    g.font = '11px Pix, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const n = p < .5 ? '00' : '01';
+    g.fillText(`LOADING ${n}`, ex - 96, ey + 84); g.fillText(label, ex + 60, ey + 84);
+    g.restore();
+  }
+}
+function transitionBB(label, swap, dur=1500){
+  if (fxBusy){ swap(); return; }
+  fxBusy = true; fx.style.display = 'block';
+  const outEl = currentLayer(), [cx, cy] = lastPt;
+  outEl.style.transformOrigin = `${cx}px ${cy}px`;
+  const outA = outEl.animate([
+    {transform:'scale(1)', filter:'blur(0px) brightness(1)'},
+    {transform:'scale(2.1)', filter:'blur(18px) brightness(2.4)'}
+  ], {duration:dur*.5, easing:'cubic-bezier(.5,0,.9,.4)', fill:'forwards'});
+  const t0 = performance.now(); let swapped = false;
+  const step = now=>{
+    const p = Math.min(1, (now - t0)/dur);
+    if (!swapped && p >= .5){
+      swapped = true; swap(); outA.cancel(); outEl.style.transformOrigin = '';
+      const inEl = currentLayer();
+      inEl.animate([
+        {transform:'scale(1.45)', filter:'blur(16px) brightness(2.2)', opacity:.2},
+        {transform:'scale(1)', filter:'blur(0px) brightness(1)', opacity:1}
+      ], {duration:dur*.5, easing:'cubic-bezier(.15,.7,.3,1)'});
+      if (inEl.id === 'hub'){
+        inEl.querySelectorAll('.file,.ttl,.win,.folder,#brand').forEach(el=>{
+          const a = rr(0, Math.PI*2), d = rnd(200, 700);
+          el.animate([
+            {transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(${rnd(1.5,3).toFixed(2)})`, filter:'blur(8px)', opacity:0},
+            {transform:'none', filter:'blur(0px)', opacity:1}
+          ], {duration:rnd(700,1000), delay:rnd(0,380), easing:'cubic-bezier(.2,.8,.25,1)', fill:'backwards'});
+        });
+      }
+    }
+    drawBB(p, label, cx, cy);
+    if (p < 1) requestAnimationFrame(step); else { g.clearRect(0,0,1280,800); fx.style.display = 'none'; fxBusy = false; }
+  };
+  requestAnimationFrame(step);
+}
+/* ============================ FLASH BUILD TRANSITION ============================
+   after Fabio's screen recording of an early-2000s flash site: stepped black bars drop in,
+   a panel slams open, a hairline cuts it, ink/tendril shapes grow out diagonally with
+   accent splatter, everything fills up — then the new page loads through a tile grid
+   stepping dark → light → gone. Runs at 12 fps on purpose (flash timeline feel).      */
+const INK = (()=>{
+  const r = mulberry(77); const L = [];
+  for (let i=0;i<9;i++){ const a = .55 + r()*.5, len = 260 + r()*520, w = 4 + r()*34, dx = r()*120-40;
+    L.push({x0: 520 + dx, y0: 380 + r()*60, a, len, w, bend: (r()-.5)*.5, t0: r()*.35}); }
+  const drops = Array.from({length:14}, ()=>({x: 120 + r()*1000, y: 120 + r()*620, r: 2 + r()*9, t0: r()}));
+  const tiles = []; for (let y=0;y<8;y++) for (let x=0;x<12;x++) tiles.push({x, y, d: (x*.6 + y + r()*3)/15});
+  return {L, drops, tiles};
+})();
+function drawFlash(p, label, dark){
+  const F = 12, dur = 1.9, q = Math.floor(p*dur*F)/(dur*F);   // stepped time
+  const ink = dark ? '#ededed' : '#0b0b0b', bgc = dark ? '#0b0b0b' : '#f4f4f2';
+  const acc = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff4fa3';
+  g.clearRect(0,0,1280,800);
+  const cov = q < .5 ? 1 : 0;
+  g.fillStyle = ink;
+  if (q < .5){
+    const k = q/.5;
+    // 1 · vertical bars drop from the top
+    const bars = [[292,22,0,.18],[560,34,.06,.24],[108,10,.1,.26],[972,16,.14,.3]];
+    bars.forEach(([x,w,a,b])=>{ const t = clamp((k-a)/(b-a)); if (t>0) g.fillRect(x, 0, w, 800*t); });
+    // 2 · panel slams open sideways
+    const tp = clamp((k-.2)/.14);
+    if (tp>0){ const w = 420*tp; g.fillRect(314 - w*.2, 190, w, 250); }
+    // 3 · hairline cut
+    if (k > .34){ g.fillStyle = bgc; g.fillRect(300, 300, 440, 2); g.fillStyle = ink; }
+    // 4 · ink tendrils grow diagonally
+    INK.L.forEach(l=>{ const t = clamp((k - .36 - l.t0*.3)/.3); if (t<=0) return;
+      g.save(); g.translate(l.x0, l.y0); g.rotate(l.a); g.beginPath();
+      const n = 10, len = l.len*t;
+      for (let i=0;i<=n;i++){ const u = i/n, x = u*len, y = Math.sin(u*3)*l.bend*80, w = l.w*(1-u*.85);
+        i ? g.lineTo(x, y - w/2) : g.moveTo(x, y - w/2); }
+      for (let i=n;i>=0;i--){ const u = i/n, x = u*len, y = Math.sin(u*3)*l.bend*80, w = l.w*(1-u*.85); g.lineTo(x, y + w/2); }
+      g.closePath(); g.fill(); g.restore(); });
+    // accent splatter
+    g.fillStyle = acc;
+    INK.drops.forEach(d=>{ if (k > .45 + d.t0*.4){ g.beginPath(); g.arc(d.x, d.y, d.r, 0, Math.PI*2); g.fill(); } });
+    g.fillStyle = ink;
+    // 5 · fill up in stepped horizontal slats
+    const tf = clamp((k-.72)/.28);
+    if (tf>0){ for (let i=0;i<10;i++){ const h = 80*clamp(tf*1.6 - i*.06); g.fillRect(0, i*80, 1280, h); } }
+    // label
+    if (k > .4){ g.fillStyle = bgc; g.font = '10px Pix, monospace'; g.fillText(`LOADING ${label}`, 322, 294); g.fillStyle = ink; }
+  } else {
+    const k = (q-.5)/.5;
+    // tile grid: cover colour → greys → gone
+    const steps = dark ? ['#ededed','#9a9a9a','#4a4a4a','#1a1a1a'] : ['#0b0b0b','#4a4a4a','#9a9a9a','#dcdcdc'];
+    INK.tiles.forEach(t=>{ const u = (k - t.d*.7)/.3; if (u >= 1) return;
+      const idx = u < 0 ? 0 : Math.min(3, Math.floor(u*4)); g.fillStyle = steps[idx];
+      g.fillRect(t.x*1280/12, t.y*100, 1280/12 + 1, 101);
+      if (u >= 0){ g.fillStyle = bgc; g.fillRect(t.x*1280/12, t.y*100, 1280/12, 1); g.fillRect(t.x*1280/12, t.y*100, 1, 100); } });
+    // bars retract upwards
+    g.fillStyle = ink;
+    [[292,22],[560,34]].forEach(([x,w],i)=>{ const t = 1 - clamp((k - .3 - i*.08)/.35); if (t>0) g.fillRect(x, 0, w, 800*t); });
+  }
+}
+function transitionFlash(label, swap, dur=1900){
+  if (fxBusy){ swap(); return; }
+  fxBusy = true; fx.style.display = 'block';
+  const dark = !$('#stage').classList.contains('light');
+  const t0 = performance.now(); let swapped = false, darkNow = dark;
+  const step = now=>{
+    const p = Math.min(1, (now - t0)/dur);
+    if (!swapped && p >= .5){ swapped = true; swap(); darkNow = !$('#stage').classList.contains('light'); }
+    drawFlash(p, label, p < .5 ? dark : dark);
+    if (p < 1) requestAnimationFrame(step); else { g.clearRect(0,0,1280,800); fx.style.display = 'none'; fxBusy = false; }
+  };
+  requestAnimationFrame(step);
+}
+const TRANS_LIST = ['win','flash','bb','shutter'];
+function popIn(el, from){
+  const r = $('#stage'); const [cx, cy] = from || lastPt;
+  el.style.transformOrigin = `${cx}px ${cy}px`;
+  el.animate([{transform:'scale(.08)', opacity:0}, {transform:'scale(1)', opacity:1}],
+             {duration:300, easing:'cubic-bezier(.2,.8,.25,1)'}).onfinish = ()=>{ el.style.transformOrigin = ''; };
+}
+function transitionWin(label, swap){ swap(); popIn(currentLayer()); }
+function transition(label, swap, dur){
+  if (TRANS === 'win') return transitionWin(label, swap);
+  if (TRANS === 'flash') return transitionFlash(label, swap);
+  return TRANS === 'bb' ? transitionBB(label, swap, dur || 1500) : transitionShutter(label, swap, dur || 1500);
+}
+
+/* ============================ VIEWS ============================ */
+let cur = null;
+function open(key){
+  if (!key) return;
+  if (key === 'home') return back(true);
+  if (key === 'q') return;
+  const lab = (ORDER.indexOf(key) >= 0 ? '0' + (ORDER.indexOf(key)+1) + '_' : '') + NAMES[key].toUpperCase();
+  transition(lab, ()=>{
+    $$('.view').forEach(v=>v.classList.remove('on')); closeLB();
+    cur = key; bias = key === 'q' ? null : key; dim = .55;
+    $('#hub').style.display = 'none';
+    $('#v-'+key).classList.add('on');
+    $('#stage').classList.toggle('light', !!PAPER[key]);
+    $('#navbar').style.display = 'flex';
+    const i = ORDER.indexOf(key);
+    $('#n-num').textContent = i >= 0 ? `0${i+1}/05` : '??/05';
+    $('#n-next').textContent = i === ORDER.length-1 ? 'desktop' : 'next';
+    $$('#v-pd video').forEach(vd=>{ key === 'pd' ? vd.play() : vd.pause(); });
+    key === 'cal' ? startFlip() : stopFlip();
+    setSection(key);
+    if (key === 'frac') showFrac(fI, true);
+  });
+}
+function back(force){
+  if (!force && $('#lb').classList.contains('on')) return closeLB();
+  if (!cur) return closeLB();
+  transition('DESKTOP', ()=>{
+    $$('.view').forEach(v=>v.classList.remove('on')); closeLB(); $('#hub').style.display = 'block';
+    $('#stage').classList.remove('light'); $('#navbar').style.display = 'none'; cur = null; bias = null; dim = 1; stopFlip(); setSection('home');
+  });
+}
+function next(){ const i = ORDER.indexOf(cur); if (i === ORDER.length-1) { back(true); } else open(ORDER[i+1]); }
+$('#n-next').onclick = next;
+$('#homebtn').onclick = ()=>back(true);
+document.addEventListener('click', e=>{
+  const o = e.target.closest('[data-open],[data-go]'); if (!o || e.target.closest('select')) return;
+  open(o.dataset.open || o.dataset.go);
+});
+$('#bestsel').addEventListener('change', e=>{ const v = e.target.value; e.target.value = ''; e.target.blur(); open(v); });
+$$('[data-arch]').forEach(f=> f.addEventListener('click', ()=>{
+  const k = f.dataset.arch; const set = k === 'all' ? ARCHP : k === 'proc' ? PROCP : ARCHP.filter(p=>p.startsWith('00_archive/'+k));
+  openLB(set, 0, NAMES.arch);
+}));
+
+/* ============================ LIGHTBOX ============================ */
+let lbSet = [], lbI = 0, lbName = '', lbAnim = null;
+function openLB(set, i, name, anim){ stopAnim(); lbSet = set; lbI = Math.max(0,i); lbName = name || ''; showLB(); $('#lb').classList.add('on'); popIn($('#lb'));
+  if (anim) lbAnim = setInterval(()=>{ lbI = (lbI+1) % lbSet.length; showLB(); }, 160); }
+function stopAnim(){ clearInterval(lbAnim); lbAnim = null; }
+function showLB(){ const p = lbSet[lbI]; $('#lb-img').src = big(p);
+  $('#lb-cap').textContent = `${lbName}/${label(p)}   ${String(lbI+1).padStart(2,'0')}/${String(lbSet.length).padStart(2,'0')}`; }
+function stepLB(d){ stopAnim(); lbI = (lbI + d + lbSet.length) % lbSet.length; showLB(); }
+function closeLB(){ stopAnim(); $('#lb').classList.remove('on'); }
+$('#lb-prev').onclick = ()=>stepLB(-1); $('#lb-next').onclick = ()=>stepLB(1); $('#lb-x').onclick = closeLB;
+$('#lb-img').onclick = ()=> lbAnim ? stopAnim() : stepLB(1);
+
+$$('.fr').forEach(fr=>{
+  const p = fr.dataset.src; fr.querySelector('img').src = big(p);
+  const key = fr.closest('.view').dataset.key;
+  const set = key === 'press' ? S.pages : ALL[key];
+  fr.onclick = ()=> openLB(set, Math.max(0, set.indexOf(p)), NAMES[key]);
+});
+$$('.run').forEach(r=>{
+  const key = r.dataset.set, set = ALL[key];
+  [...set, ...set].forEach((p,i)=>{ const im = new Image(); im.src = sm(p); im.draggable = false;
+    im.onclick = ()=>openLB(set, i % set.length, NAMES[key]); r.appendChild(im); });
+});
+
+/* ============================ 01 WATCH TILES ============================ */
+const GROUPS = {...OBJ, pscans:S.scans};
+$$('.view .tile').forEach(t=>{
+  const k = t.dataset.group, set = GROUPS[k], g0 = t.querySelector('.tg');
+  set.forEach((p,i)=>{ const im = new Image(); im.src = k === 'watch' ? big(p) : sm(p); im.draggable = false;
+    im.onclick = ()=>openLB(set, i, OBJNAMES[k]); g0.appendChild(im); });
+});
+$$('.view .tile .bar i').forEach(b=>b.style.visibility = 'hidden');
+
+/* ============================ 02 PRESS ============================ */
+(function(){
+  const run = $('#ticker .run2'), t = run.dataset.text.replace(/(#\w+)/g, '<em>$1</em>');
+  run.innerHTML = `<span>${t}</span><span>${t}</span>`;
+})();
+const ptable = $('#ptable'); let pz = 20;
+const ppins = S.pages.slice(1).map((p,i,arr)=>{
+  const d = document.createElement('div'); d.className = 'pin';
+  const im = new Image(); im.src = big(p); d.appendChild(im);
+  d.addEventListener('dblclick', ()=>openLB(S.pages, i+1, NAMES.press));
+  d.addEventListener('pointerdown', e=>{
+    e.preventDefault(); d.setPointerCapture(e.pointerId); d.classList.add('drag'); d.style.zIndex = ++pz;
+    const sx = e.clientX, sy = e.clientY, l = d.offsetLeft, t = d.offsetTop;
+    const mv = ev=>{ d.style.left = (l + (ev.clientX-sx)/SCALE)+'px'; d.style.top = (t + (ev.clientY-sy)/SCALE)+'px'; };
+    const up = ()=>{ d.classList.remove('drag'); d.removeEventListener('pointermove',mv); d.removeEventListener('pointerup',up); };
+    d.addEventListener('pointermove',mv); d.addEventListener('pointerup',up);
+  });
+  ptable.appendChild(d); return d;
+});
+function pplace(mode){
+  ppins.forEach((d,i)=>{
+    d.style.transition = 'left .6s, top .6s';
+    if (mode === 'grid'){ d.style.left = (10 + (i%4)*176) + 'px'; d.style.top = (20 + Math.floor(i/4)*232) + 'px'; d.style.zIndex = i+1; }
+    else if (mode === 'pile'){ d.style.left = (280 + rnd(-30,30)) + 'px'; d.style.top = (190 + rnd(-30,30)) + 'px'; d.style.zIndex = 10-i; }
+    else { d.style.left = rnd(0,560) + 'px'; d.style.top = rnd(0,430) + 'px'; d.style.zIndex = ++pz; }
+    setTimeout(()=> d.style.transition = '', 650);
+  });
+}
+pplace('grid');
+$('#pb-pile').onclick = ()=>pplace('pile'); $('#pb-grid').onclick = ()=>pplace('grid'); $('#pb-shuffle').onclick = ()=>pplace('shuffle');
+
+
+/* ============================ 03 CALENDAR ============================ */
+const table = $('#table'); let zTop = 20;
+const pins = S.months.map((p,i)=>{
+  const d = document.createElement('div'); d.className = 'pin';
+  const im = new Image(); im.src = big(p); d.appendChild(im);
+  d.addEventListener('dblclick', ()=>openLB(S.months, i, NAMES.cal));
+  d.addEventListener('pointerdown', e=>{
+    e.preventDefault(); d.setPointerCapture(e.pointerId); d.classList.add('drag'); d.style.zIndex = ++zTop;
+    const sx = e.clientX, sy = e.clientY, l = d.offsetLeft, t = d.offsetTop;
+    const mv = ev=>{ d.style.left = (l + (ev.clientX-sx)/SCALE)+'px'; d.style.top = (t + (ev.clientY-sy)/SCALE)+'px'; };
+    const up = ()=>{ d.classList.remove('drag'); d.removeEventListener('pointermove',mv); d.removeEventListener('pointerup',up); };
+    d.addEventListener('pointermove',mv); d.addEventListener('pointerup',up);
+  });
+  table.appendChild(d); return d;
+});
+function place(mode){
+  pins.forEach((d,i)=>{
+    d.style.transition = 'left .6s, top .6s, width .6s';
+    d.style.width = mode === 'grid' ? '94px' : '130px';
+    if (mode === 'grid'){ d.style.left = (i%7)*102 + 'px'; d.style.top = (90 + Math.floor(i/7)*190) + 'px'; d.style.zIndex = i+1; }
+    else if (mode === 'pile'){ d.style.left = (290 + rnd(-40,40)) + 'px'; d.style.top = (220 + rnd(-40,40)) + 'px'; d.style.zIndex = 14-i; }
+    else { d.style.left = rnd(0,580) + 'px'; d.style.top = rnd(0,470) + 'px'; d.style.zIndex = ++zTop; }
+    setTimeout(()=> d.style.transition = '', 650);
+  });
+}
+place('shuffle');
+$('#b-pile').onclick = ()=>place('pile'); $('#b-grid').onclick = ()=>place('grid'); $('#b-shuffle').onclick = ()=>place('shuffle');
+S.hands.forEach(p=>{ const i = new Image(); i.src = big(p); });
+let flipT = null, flipI = 0;
+function startFlip(){ stopFlip(); flipT = setInterval(()=>{ flipI = (flipI+1) % S.hands.length; $('#flip img').src = big(S.hands[flipI]); }, 160); }
+function stopFlip(){ clearInterval(flipT); }
+$('#flip img').src = big(S.hands[0]);
+$('#flip').onclick = ()=>openLB(S.hands, flipI, 'flipbook', true);
+
+/* ============================ 04 FRACTIONS — page flip ============================ */
+let fI = 0, flipping = false;
+/* spine x + page top/bottom per scan (auto-detected, a few corrected by eye) → every spread is scaled
+   to the same page height and shifted so the spiral binding sits exactly in the middle */
+const SPINE = [["18-11-20",1144,1600,96,18,1462],["18-12-05",1447,1600,173,17,1599],["18-13-17",1600,1187,814,101,1098],["18-18-24",1600,1254,670,60,880],["18-43-36",1600,1184,825,115,1162],["18-58-09",1600,1141,801,68,1115],["18-58-53",1600,1239,672,62,890],["19-01-33",1600,1173,833,120,1152],["19-03-06",1600,1226,655,96,872],["19-06-33",1600,1197,853,138,1147],["19-08-38",1600,1142,819,102,1101],["19-32-22",1600,1193,843,156,1150],["19-33-51",1600,1201,842,172,1175],["19-35-09",1600,1233,841,174,1179],["19-35-53",1600,1148,852,85,1040],["19-37-10",1600,1236,806,117,1186],["19-41-15",1600,1433,720,149,1137],["19-42-20",1600,1171,756,137,1103],["19-43-01",1600,1186,747,127,1095],["19-44-19",1600,1196,832,159,1182],["19-45-07",1600,1128,771,80,1097],["19-59-10",1600,1172,751,99,1116],["20-01-48",1600,1165,613,77,1164],["20-03-05",1600,1160,741,58,1058],["20-04-15",1600,1127,724,124,1100],["20-05-03",1600,1182,745,127,1110],["20-05-43",1600,1181,775,122,1167],["20-07-14",1600,1097,754,42,1064],["20-09-50",1600,1096,806,33,1059],["20-12-43",1262,1600,1193,52,1556]];
+const GEO = {}; SPINE.forEach(([k,w,h,x,y0,y1])=>GEO['04_fractions/scan_2026-08-25_'+k] = {w,h,x,y0,y1});
+const BOOK_W = 900, BOOK_H = 636, PAGE_H = 560;
+function paint(el, p){
+  el.style.backgroundImage = `url("${nrm(p)}")`;
+  el.style.backgroundSize = '100% 100%';
+  el.style.backgroundPosition = '0 0';
+}
+const nrm = p => W + p.replace('04_fractions/','04_fractions/n/') + '.jpg';
+const setL = p => paint($('#bL'), p);
+const setR = p => paint($('#bR'), p);
+S.frac.forEach(p=>{ const i = new Image(); i.src = nrm(p); });
+function marks(){
+  $('#fr-num').textContent = String(fI+1).padStart(2,'0'); $('#fr-of').textContent = '/ ' + S.frac.length;
+  $$('#pnums span').forEach((s,i)=>s.classList.toggle('cur', i === fI));
+}
+function showFrac(i, instant){
+  i = Math.max(0, Math.min(S.frac.length-1, i));
+  if (flipping || (i === fI && !instant)) return;
+  const old = S.frac[fI], nw = S.frac[i], fwd = i > fI;
+  if (instant){ fI = i; setL(nw); setR(nw); marks(); return; }
+  flipping = true;
+  const leaf = $('#leaf'), lf = $('#lf'), lb = $('#lbk'), sh = $('#lsh');
+  lf.className = 'ly front ' + (fwd ? 'R' : 'L'); lb.className = 'ly back ' + (fwd ? 'L' : 'R');
+  paint(lf, old); paint(lb, nw);
+  if (fwd){ setL(old); setR(nw); } else { setL(nw); setR(old); }
+  sh.style.clipPath = fwd ? 'inset(0 0 0 calc(50% + 1px))' : 'inset(0 calc(50% + 1px) 0 0)';
+  leaf.style.display = 'block';
+  const a = leaf.animate([{transform:'rotateY(0deg)'},{transform:`rotateY(${fwd ? -180 : 180}deg)`}], {duration:750, easing:'cubic-bezier(.45,.05,.35,1)'});
+  sh.animate([{background:'rgba(0,0,0,0)'},{background:'rgba(0,0,0,.25)', offset:.5},{background:'rgba(0,0,0,0)'}], {duration:750});
+  fI = i; marks();
+  a.onfinish = ()=>{ setL(nw); setR(nw); leaf.style.display = 'none'; flipping = false; };
+}
+S.frac.forEach((p,i)=>{ const s = document.createElement('span'); s.textContent = String(i+1).padStart(2,'0'); s.onclick = ()=>showFrac(i); $('#pnums').appendChild(s); });
+$('#fr-prev').onclick = ()=>showFrac(fI-1); $('#fr-next').onclick = ()=>showFrac(fI+1);
+$('#book').addEventListener('click', e=>{
+  const r = e.currentTarget.getBoundingClientRect();
+  (e.clientX - r.left) > r.width/2 ? showFrac(fI+1) : showFrac(fI-1);
+});
+$('#book').addEventListener('dblclick', ()=>openLB(S.frac, fI, NAMES.frac));
+showFrac(0, true);
+
+/* ============================ CHAPTER TITLES → SUBPAGES ============================ */
+ORDER.forEach(k=>{
+  const src = $(`#hub .ttl[data-open="${k}"]`), dst = $(`#v-${k} .vtitle`);
+  if (!src || !dst) return;
+  dst.className = 'vtitle ' + [...src.classList].filter(c=>!['ttl','drg'].includes(c)).join(' ');
+  dst.innerHTML = src.innerHTML;
+  dst.style.fontSize = src.style.fontSize; dst.style.fontWeight = src.style.fontWeight;
+});
+
+/* ============================ WINDOW CLOSE BOXES ============================ */
+$$('.win .bar i').forEach(b=>{
+  b.addEventListener('pointerdown', e=>e.stopPropagation());
+  b.addEventListener('click', e=>{ e.stopPropagation(); const w = b.closest('.win'); w.classList.add('closing');
+    setTimeout(()=>{ w.style.display = 'none'; w.classList.remove('closing'); }, 230); });
+});
+
+/* ============================ NOTES + TIMER ============================ */
+let tStart = null, secKey = 'home';
+const secT = {}; let secSince = null;
+const fmt = sec => String(Math.floor(sec/60)).padStart(2,'0') + ':' + String(Math.floor(sec%60)).padStart(2,'0');
+function setSection(k){
+  const onHub = !k || k === 'home' || k === 'q';
+  $('#homebtn').style.display = onHub ? 'none' : 'block';
+  const now = performance.now();
+  if (secSince !== null) secT[secKey] = (secT[secKey]||0) + (now - secSince)/1000;
+  secKey = k || 'home'; secSince = now;
+}
+function tickCountdown(){
+  const el = $('#countdown');
+  if (tStart === null){ el.textContent = '10:00'; return; }
+  const left = 600 - (performance.now() - tStart)/1000;
+  el.textContent = (left < 0 ? '-' : '') + fmt(Math.abs(left));
+  el.classList.toggle('over', left < 0);
+}
+setInterval(tickCountdown, 250);
+function startTimer(){ tStart = performance.now(); for (const k in secT) delete secT[k]; secSince = null; setSection(cur || 'home'); }
+
+/* ============================ KEYS ============================ */
+addEventListener('keydown', e=>{
+  if (e.target.tagName === 'SELECT') return;
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','PageUp','PageDown','Home','End'].includes(e.key)) e.preventDefault();
+  if ($('#loader').style.display !== 'none'){ if (e.key === 'Enter' || e.key === ' ') enter(); return; }
+  if (e.key === 'Escape') return back();
+  const lb = $('#lb').classList.contains('on');
+  if (e.key === 'ArrowRight'){ lb ? stepLB(1) : cur === 'frac' && showFrac(fI+1); }
+  if (e.key === 'ArrowLeft'){ lb ? stepLB(-1) : cur === 'frac' && showFrac(fI-1); }
+  if (/^[1-5]$/.test(e.key)) open(ORDER[+e.key-1]);
+  if (e.key === 'n') next();
+  if (e.key === 'r') startTimer();
+  if (e.key === 't'){ TRANS = TRANS_LIST[(TRANS_LIST.indexOf(TRANS)+1) % TRANS_LIST.length]; console.log('transition:', TRANS); }
+});
+/* never let the browser scroll the stage */
+['#viewport','#stage'].forEach(s=>$(s).addEventListener('scroll', e=>{ e.target.scrollTop = 0; e.target.scrollLeft = 0; }));
+
+/* ============================ LOADER ============================ */
+(function(){
+  const bar = $('#lbar'); for (let i=0;i<24;i++) bar.appendChild(document.createElement('i'));
+  const warm = [...S.months, ...S.pd, ...S.frac.slice(0,8), ...S.obj.slice(0,12), ...S.hands.slice(0,8)].map(big);
+  let done = 0, shown = 0;
+  warm.forEach(u=>{ const i = new Image(); i.onload = i.onerror = ()=>done++; i.src = u; });
+  const t = setInterval(()=>{
+    const real = done / warm.length * 100;
+    shown = Math.min(100, Math.max(shown + .8, Math.min(real, shown + 4)));
+    $('#lpct').textContent = 'loading ' + Math.floor(shown) + '%';
+    [...bar.children].forEach((b,i)=>b.classList.toggle('on', i < shown/100*24));
+    if (shown >= 100){ clearInterval(t); $('#lpct').textContent = 'complete.'; $('#enter').style.visibility = 'visible'; }
+  }, 45);
+})();
+document.fonts && document.fonts.load('10px Pix');
+function enter(){ if ($('#enter').style.visibility !== 'visible' || fxBusy) return;
+  transition('DESKTOP', ()=>{ $('#loader').style.display = 'none'; startDrift(); startTimer(); }); }
+$('#enter').onclick = enter;
+</script>
+</body>
+</html>
