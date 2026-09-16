@@ -41,7 +41,9 @@
   --folder:var(--accent);
   --fg:#ededed; --mid:#9a9a9a; --dim:#5c5c5c; --bg:#0b0b0b; --paper:#f4f4f2; --ink:#111; }
 *{ box-sizing:border-box; }
-html,body{ margin:0; height:100%; background:#000; overflow:hidden; }
+html,body{ margin:0; height:100%; background:#000; overflow:hidden; -webkit-text-size-adjust:100%; }
+*{ -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
+img{ -webkit-user-drag:none; }
 #viewport{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#000; overflow:hidden; }
 #stage{ position:relative; width:1280px; height:800px; flex:0 0 auto; transform-origin:center; overflow:hidden;
         font-family:Verdana,Geneva,sans-serif; color:var(--fg); background:var(--bg); user-select:none; cursor:default; }
@@ -485,21 +487,28 @@ function applyScale(){ SCALE = Math.min(innerWidth/1280, innerHeight/800); $('#s
 addEventListener('resize', applyScale); applyScale();
 
 /* ============================ DRAG (desktop) ============================ */
-let zHub = 100, suppressClick = false;
-document.addEventListener('click', e=>{ if (suppressClick){ e.stopPropagation(); e.preventDefault(); } }, true);
+let zHub = 100, dragGuard = 0;
+/* Safari/Firefox-safe: native clicks on draggable things are swallowed; a tap (no real movement)
+   is re-fired as ONE synthetic click on pointerup. → single click always works, drags never open. */
+document.addEventListener('click', e=>{ if (e.isTrusted && performance.now() < dragGuard){ e.stopPropagation(); e.preventDefault(); } }, true);
 function makeDrag(el){
   const handle = el.dataset.handle ? el.querySelector(el.dataset.handle) : el;
   handle.addEventListener('pointerdown', e=>{
     if (e.button !== 0 || e.target.closest('select')) return;
     e.preventDefault();
-    const sx = e.clientX, sy = e.clientY, l = el.offsetLeft, t = el.offsetTop; let moved = false;
+    const target = e.target, sx = e.clientX, sy = e.clientY, l = el.offsetLeft, t = el.offsetTop; let moved = false;
     el.style.zIndex = ++zHub;
-    const mv = ev=>{ const dx = (ev.clientX-sx)/SCALE, dy = (ev.clientY-sy)/SCALE;
-      if (!moved && Math.hypot(dx,dy) < 4) return;
-      moved = true; el.classList.add('dragging'); el.style.left = (l+dx)+'px'; el.style.top = (t+dy)+'px'; };
-    const up = ()=>{ removeEventListener('pointermove',mv); removeEventListener('pointerup',up); el.classList.remove('dragging');
-      if (moved){ suppressClick = true; setTimeout(()=>suppressClick = false, 0); } };
-    addEventListener('pointermove',mv); addEventListener('pointerup',up);
+    dragGuard = performance.now() + 1500;
+    const mv = ev=>{ const px = Math.hypot(ev.clientX-sx, ev.clientY-sy);
+      if (!moved && px < 8) return;
+      moved = true; el.classList.add('dragging');
+      el.style.left = (l + (ev.clientX-sx)/SCALE)+'px'; el.style.top = (t + (ev.clientY-sy)/SCALE)+'px'; };
+    const up = ev=>{ removeEventListener('pointermove',mv); removeEventListener('pointerup',up); removeEventListener('pointercancel',up);
+      el.classList.remove('dragging');
+      dragGuard = performance.now() + 400;
+      if (!moved && ev.type === 'pointerup') target.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, clientX:ev.clientX, clientY:ev.clientY}));
+    };
+    addEventListener('pointermove',mv); addEventListener('pointerup',up); addEventListener('pointercancel',up);
   });
 }
 
