@@ -231,6 +231,7 @@ img{ -webkit-user-drag:none; }
 /* lightbox */
 #lb{ position:absolute; inset:0; z-index:60; background:rgba(0,0,0,.94); display:none; }
 #lb.on{ display:block; }
+#lb video{ position:absolute; left:40px; top:34px; width:1200px; height:680px; object-fit:contain; background:#000; }
 #lb img{ position:absolute; left:40px; top:34px; width:1200px; height:680px; object-fit:contain; }
 #lb .bar{ position:absolute; left:40px; right:40px; bottom:22px; display:flex; justify-content:space-between; font-size:10px; color:var(--fg); }
 #lb .bar span{ cursor:pointer; margin-left:24px; }
@@ -264,11 +265,11 @@ img{ -webkit-user-drag:none; }
     <div id="files"></div>
 
     <!-- ✏️ EDIT project titles + subtitles — they are automatically copied to the matching subpage -->
-    <div class="ttl hand drg" data-open="cal" style="left:56px;top:34px;font-size:30px;">ANNUAL CALENDAR<small>Module: Zine & Zeichnen</small></div>
-    <div class="ttl pixb drg" data-open="obj" style="left:950px;top:196px;font-size:26px;">LONGINES WATCH<small>Module: Labs2</small></div>
-    <div class="ttl geo drg" data-open="press" style="left:676px;top:612px;font-size:25px;font-weight:600;">CONSPIRACY NEWSPAPER<small>Module: Layout</small></div>
+    <div class="ttl hand drg" data-open="cal" style="left:56px;top:34px;font-size:30px;">ANNUAL CALENDAR<small>Zine & Zeichnen</small></div>
+    <div class="ttl pixb drg" data-open="obj" style="left:950px;top:196px;font-size:26px;">LONGINES WATCH<small>Labs2</small></div>
+    <div class="ttl geo drg" data-open="press" style="left:676px;top:612px;font-size:25px;font-weight:600;">CONSPIRACY NEWSPAPER<small>Layout</small></div>
     <div class="ttl pl drg" data-open="frac" style="left:62px;top:468px;font-size:27px;">BETWEEN FRACTIONS OF OUR LIFES<small>Week with Binta Kopp: Collaborative Zine</small></div>
-    <div class="ttl term drg" data-open="pd" style="left:958px;top:556px;font-size:32px;">POST DIGITAL 3D RENDER<small>Module: 3D Design</small></div>
+    <div class="ttl term drg" data-open="pd" style="left:958px;top:556px;font-size:32px;">POST DIGITAL 3D RENDER<small>3D Design</small></div>
     <!-- ✏️ /EDIT -->
 
     <div id="brand" class="drg">
@@ -303,7 +304,7 @@ img{ -webkit-user-drag:none; }
 
     <div class="folder clk drg" data-arch="01" style="left:430px;top:128px;"><i></i><span>01_semester</span></div>
     <div class="folder clk drg" data-arch="02" style="left:1180px;top:140px;"><i></i><span>02_semester</span></div>
-    <div class="folder clk drg" data-arch="proc" style="left:250px;top:720px;"><i></i><span>process_pics</span></div>
+    <div class="folder clk drg" data-arch="vid" style="left:250px;top:720px;"><i></i><span>videos</span></div>
     <div class="folder clk drg" data-arch="all" style="left:370px;top:720px;"><i></i><span>hkb_everything</span></div>
   </div>
 
@@ -403,6 +404,7 @@ img{ -webkit-user-drag:none; }
 
   <div id="lb">
     <img id="lb-img">
+    <video id="lb-vid" muted loop playsinline autoplay style="display:none"></video>
     <div class="bar pix"><span class="cap" id="lb-cap" style="margin:0;cursor:default;"></span>
       <div><span id="lb-prev">prev</span><span id="lb-next">next</span><span id="lb-x">close</span></div></div>
   </div>
@@ -449,12 +451,12 @@ const OBJ = {
 for (const k in OBJ) OBJ[k] = OBJ[k].map(n=>'01_object/'+n);
 S.obj = Object.values(OBJ).flat();
 const OBJNAMES = {watch:'00_the_watch', raw:'01_raw_scans', edits:'02_edits', booklet:'03_booklet_repro', line:'04_clothesline', pscans:'scans'};
-const ARCH = [["01_04_typedesign_1","Poster_Exhibition.pdf"],["01_04_typedesign_4","Element 1.png"],["01_05_indesign_illustrator_2","Entwurf_1_Publikation.pdf"],["01_06_fabio zine_0","BG_IMPRESSO.png"],["01_08_bildfindung_2","scan_2025-12-15_12-26.pdf"],["01_08_bildfindung_3","scan_2025-12-15_12-37.pdf"],["02_01_schreiben_layout_publish_1","ascii-art-text_1.png"],["02_07_designtheory_2","Representation.001.jpeg"],["02_09_infographics_1","gray_arc-10.png"],["02_09_infographics_4","MUESHAN.tif"],["02_10_3d_1","preview.png"],["02_10_3d_2","preview copy.png"]];
-const PROC = [["p001_img_3213","IMG_3213.jpeg"],["p004_img_3233","IMG_3233.jpeg"],["p005_img_3234","IMG_3234.jpeg"],["p006_img_3237","IMG_3237.jpeg"],["p008_img_3240","IMG_3240.jpeg"],["p009_img_3243","IMG_3243.jpeg"],["p014__e7a6287","_E7A6287.JPG"],["p052__e7a6325","_E7A6325.JPG"],["p055__e7a6328","_E7A6328.JPG"],["p088__e7a8975","_E7A8975.JPG"],["p091__e7a8978","_E7A8978.JPG"],["p104__e7a8991","_E7A8991.JPG"],["p106__e7a8993","_E7A8993.JPG"],["p111__e7a8999","_E7A8999.JPG"],["p121__e7a9011","_E7A9011.JPG"],["p122__e7a9012","_E7A9012.JPG"],["p124__e7a9014","_E7A9014.JPG"],["p126__e7a9016","_E7A9016.JPG"],["p138__e7a9029","_E7A9029.JPG"],["p150__e7a9042","_E7A9042.JPG"],["p158__e7a9051","_E7A9051.JPG"],["p163__e7a9056","_E7A9056.JPG"],["p169__e7a9063","_E7A9063.JPG"],["p173__e7a9067","_E7A9067.JPG"],["p174__e7a9068","_E7A9068.JPG"],["p175_dscf7721","DSCF7721.JPG"],["p177_dscf7723","DSCF7723.JPG"],["p178_dscf7724","DSCF7724.JPG"],["p179_dscf7726","DSCF7726.JPG"],["p180_dscf7727","DSCF7727.JPG"],["p182_dscf7729","DSCF7729.JPG"],["p186_dscf7733","DSCF7733.JPG"],["p190_dscf7737","DSCF7737.JPG"],["p191_dscf7738","DSCF7738.JPG"],["p193_dscf7740","DSCF7740.JPG"],["p194_dscf7741","DSCF7741.JPG"],["p196_dscf7744","DSCF7744.JPG"],["p241_dscf8463","DSCF8463.JPG"],["p244_dscf8466","DSCF8466.JPG"],["p245_dscf8467","DSCF8467.JPG"],["p295_dscf8517","DSCF8517.JPG"],["p300_dscf8522","DSCF8522.JPG"],["p306_dscf8528","DSCF8528.JPG"],["p310_dscf8532","DSCF8532.JPG"]];
-const PROCP = PROC.map(a=>'00_process/'+a[0]);
-const ARCHP = [...ARCH.map(a=>'00_archive/'+a[0]), ...PROCP];
+/* desktop files from 00_HKB: [file in web/00_desk, original name, i=image / v=video] */
+const DESK = [["1_bildfindung_01","scan_2025-12-15_11-07-13.tif","i"],["1_bildfindung_04","scan_2025-12-15_11-15-06.tif","i"],["1_bildfindung_07","scan_2025-12-15_11-30-50.tif","i"],["1_bildfindung_13","scan_2025-12-15_11-38-05.tif","i"],["1_bildfindung_16","scan_2025-12-15_11-41-33.tif","i"],["1_bildfindung_21","scan_2025-12-15_11-48-41.tif","i"],["1_bildfindung_24","scan_2025-12-15_11-57-13.tif","i"],["1_bildfindung_33","Poster1.tif","i"],["1_bildfindung_34","Poster2.tif","i"],["1_bildfindung_38","Poster4.tif","i"],["1_exhibition_01","05FBC676-C571-4FCA-BF82-E7944231A1F3-766-00000006FCC8CABD.jpg","i"],["1_exhibition_04","872005F0-AE40-47A7-916C-331A674F4AB7-766-00000007048F3B18.jpg","i"],["1_exhibition_07","D342DAB6-2C88-46DA-9D25-300B81DC88E9-766-000000070200EBA3.jpg","i"],["1_exhibition_09","FE716961-30C4-48FC-B080-B2EDB0866015.jpg","i"],["1_indesign_01","Entwurf_1_Publikation_Ausdruck_1.pdf p1","i"],["1_indesign_05","FINALFINALFINALFINAL7.pdf p2","i"],["1_indesign_06","FINALFINALFINALFINAL7.pdf p3","i"],["1_indesign_08","FINALFINALFINALFINAL7.pdf p5","i"],["1_labwoche_02","IMG_3215.mov","v"],["1_labwoche_03","Journal_Labwoche_Fabio_no_video.pdf p1","i"],["1_labwoche_05","Journal_Labwoche_Fabio_no_video.pdf p3","i"],["1_labwoche_06","Journal_Labwoche_Fabio_no_video.pdf p4","i"],["1_repro_01","Buchoffen_IMG_0892.jpg","i"],["1_repro_03","Klopapier.tif","i"],["1_repro_05","scan_2026-01-14_18-21-42.tif","i"],["1_repro_10","_E7A8937.JPG","i"],["1_repro_11","_E7A8944.JPG","i"],["1_repro_13","_E7A8958.JPG","i"],["1_repro_16","_E7A9017.JPG","i"],["1_repro_18","DSCF7721.JPG","i"],["1_repro_19","DSCF7727.JPG","i"],["1_repro_22","_E7A6283.JPG","i"],["1_repro_26","HS2025_FotoVIscom_Fabio_Riesen_Fotos.pdf p1","i"],["1_typedesign_01","RiesenFabio_specimen.pdf p1","i"],["1_typedesign_02","RiesenFabio_specimen.pdf p2","i"],["1_typedesign_03","RiesenFabio_specimen.pdf p3","i"],["1_typedesign_04","RiesenFabio_specimen.pdf p5","i"],["1_typedesign_05","RiesenFabio_specimen.pdf p7","i"],["1_typo_01","3bca0134-54b4-4a62-9fc6-5a442a938ade.JPG","i"],["1_typo_03","IMG_2495.HEIC","i"],["1_typo_04","IMG_2496.HEIC","i"],["1_typo_09","IMG_2501.HEIC","i"],["1_typo_10","IMG_2504.HEIC","i"],["1_typo_12","IMG_2509.HEIC","i"],["1_typo_14","IMG_2576.HEIC","i"],["1_typo_15","IMG_2577.HEIC","i"],["1_zine_01","Zinee0001.tif","i"],["1_zine_02","Zinee0002.tif","i"],["1_zine_03","Zinee0003.tif","i"],["1_zine_05","Zinee0005.tif","i"],["1_zine_08","Zinee0008.tif","i"],["1_zine_10","Zinee0010.tif","i"],["1_zine_12","Zinee0012.tif","i"],["2_3d_01","renderfirstcd.png","i"],["2_imagesound_01","inoutrender.mp4","v"],["2_imagesound_02","showcase1.mp4","v"],["2_imagesound_03","SUFFOCATION_WAVES.mp4","v"],["2_infographics_01","WORKFILE.png","i"],["2_infographics_03","gray_arc-11.png","i"],["2_infographics_06","gray_arc-2.png","i"],["2_infographics_09","gray_arc-5.png","i"],["2_infographics_15","gray_signal_portrait.png","i"],["2_infographics_19","composition2.png","i"],["2_infographics_22","FInal_Poster.tif","i"],["2_layout_03","Gemini_Generated_Image_cgxxqkcgxxqkcgxx.png","i"],["2_layout_04","PUPIGEBURI_LUV.png","i"],["2_layout_05","animecheib.png","i"],["2_layout_09","bloodfalls.png","i"],["2_layout_12","globeee_dither.png","i"],["2_layout_15","huere_figgaehrrr_drainedcheib.png","i"],["2_layout_19","katyperry.png","i"],["2_layout_24","pings.png","i"],["2_layout_30","schwimmviech.png","i"],["2_layout_33","sharksiech.png","i"],["2_layout_36","teletext.png","i"],["2_layout_40","Maquetten_Druck_Layoutfff_ansicht_doppel.pdf p1","i"],["2_photoweek_01","IMG_1212 2.jpg","i"],["2_photoweek_02","IMG_1213 2.jpg","i"],["2_photoweek_05","IMG_1224 2.jpg","i"],["2_photoweek_09","IMG_1242 2.jpg","i"],["2_photoweek_12","IMG_1289 2.jpg","i"],["2_photoweek_14","IMG_1304 2.jpg","i"],["2_photoweek_19","IMG_1336 2.jpg","i"],["2_photoweek_20","IMG_1338 2.jpg","i"]];
+const ARCHP = DESK.map(a=>'00_desk/'+a[0]);
+const VIDS = new Set(DESK.filter(a=>a[2]==='v').map(a=>'00_desk/'+a[0]));
 const SHAPES = ['ebene_1','ebene_2','rossofuoco','women','ebene_9','ebene_10','ebene_13','ebene_16','ebene_18'].map(n=>'web/00_shapes/'+n+'.png');
-const LABEL = {}; ARCH.forEach(a=>LABEL['00_archive/'+a[0]] = a[1]); PROC.forEach(a=>LABEL['00_process/'+a[0]] = a[1]);
+const LABEL = {}; DESK.forEach(a=>LABEL['00_desk/'+a[0]] = a[1]);
 
 const big = p => W + p + '.jpg';
 const sm  = p => { const i = p.lastIndexOf('/'); return W + p.slice(0,i) + '/t' + p.slice(i) + '.jpg'; };
@@ -527,6 +529,7 @@ function addFile(p, x, y, w, h, key, loose){
   d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.zIndex = Math.floor(R()*20);
   let el;
   if (p === 'VIDEO'){ el = document.createElement('video'); Object.assign(el,{src:W+'05_postdigital/chrome_loop.mp4',muted:true,loop:true,autoplay:true,playsInline:true}); }
+  else if (VIDS.has(p)){ el = document.createElement('video'); Object.assign(el,{src:W+p+'.mp4',poster:sm(p),muted:true,loop:true,autoplay:true,playsInline:true}); el.setAttribute('muted',''); el.setAttribute('playsinline',''); }
   else { el = new Image(); el.src = sm(p); el.draggable = false; }
   el.style.width = w + 'px'; el.style.height = h + 'px';
   el.className = 'br'; el.style.animationDelay = (-rr(0,8)).toFixed(2)+'s'; el.style.animationDuration = rr(6,10).toFixed(2)+'s';
@@ -549,14 +552,14 @@ CL.forEach(c=>{
     addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, c.key, false);
   });
 });
-const ZONES = [[690,100,180,110],[410,270,460,200],[664,56,260,230],[16,310,226,150],[1020,50,260,110],[1150,0,130,50],[228,222,166,100],[550,140,110,110],[0,0,1280,34],[40,40,330,60],[940,186,340,56],[660,600,200,44],[50,458,360,48],[950,546,330,56],[590,490,190,30],[0,770,560,30],[420,110,100,70],[1160,100,100,70],[360,700,100,70],[865,480,100,70]];
+const ZONES = [[240,700,100,70],[860,630,110,120],[690,100,180,110],[410,270,460,200],[664,56,260,230],[16,310,226,150],[1020,50,260,110],[1150,0,130,50],[228,222,166,100],[550,140,110,110],[0,0,1280,34],[40,40,330,60],[940,186,340,56],[660,600,200,44],[50,458,360,48],[950,546,330,56],[590,490,190,30],[0,770,560,30],[420,110,100,70],[1160,100,100,70],[360,700,100,70],[865,480,100,70]];
 const inZone = (x,y) => ZONES.some(([zx,zy,zw,zh]) => x > zx-20 && x < zx+zw+20 && y > zy-20 && y < zy+zh+20)
   || CL.some(c => ((x-c.cx)/(c.rx+45))**2 + ((y-c.cy)/(c.ry+45))**2 < 1);
 ARCHP.forEach(p=>{
   const s = rr(28,44), port = R() < .5, w = Math.round(port ? s*.74 : s), h = Math.round(port ? s : s*.74);
   let x, y, t = 0;
-  do { x = rr(20, 1240); y = rr(40, 745); t++; } while ((!free(x,y,Math.max(w,h)/2+14, 1) || inZone(x,y)) && t < 300);
-  if (t < 300) addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, null, true);
+  do { x = rr(20, 1240); y = rr(40, 745); t++; } while ((!free(x,y,Math.max(w,h)/2+6, .9) || inZone(x,y)) && t < 700);
+  if (t < 700) addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, null, true);
 });
 $$('#hub .drg').forEach(makeDrag);
 $$('.view .sticker').forEach(makeDrag);
@@ -578,7 +581,7 @@ $$('.txtwin').forEach((w,i)=>{
 
 /* ============================ DRIFT ============================ */
 const drift = $('#drift');
-const POOL = Object.values(ALL).flat();
+const POOL = Object.values(ALL).flat().filter(p=>!VIDS.has(p));
 let bias = null, dim = 1;
 function spawn(){
   if (document.hidden) return;
@@ -947,7 +950,7 @@ document.addEventListener('click', e=>{
 });
 $('#bestsel').addEventListener('change', e=>{ const v = e.target.value; e.target.value = ''; e.target.blur(); open(v); });
 $$('[data-arch]').forEach(f=> f.addEventListener('click', ()=>{
-  const k = f.dataset.arch; const set = k === 'all' ? ARCHP : k === 'proc' ? PROCP : ARCHP.filter(p=>p.startsWith('00_archive/'+k));
+  const k = f.dataset.arch; const set = k === 'all' ? ARCHP : k === 'vid' ? ARCHP.filter(p=>VIDS.has(p)) : ARCHP.filter(p=>p.startsWith('00_desk/'+k.slice(1)+'_'));
   openLB(set, 0, NAMES.arch);
 }));
 
@@ -956,10 +959,12 @@ let lbSet = [], lbI = 0, lbName = '', lbAnim = null;
 function openLB(set, i, name, anim){ stopAnim(); lbSet = set; lbI = Math.max(0,i); lbName = name || ''; showLB(); $('#lb').classList.add('on'); popIn($('#lb'));
   if (anim) lbAnim = setInterval(()=>{ lbI = (lbI+1) % lbSet.length; showLB(); }, 160); }
 function stopAnim(){ clearInterval(lbAnim); lbAnim = null; }
-function showLB(){ const p = lbSet[lbI]; $('#lb-img').src = big(p);
+function showLB(){ const p = lbSet[lbI], v = VIDS.has(p), vid = $('#lb-vid');
+  $('#lb-img').style.display = v ? 'none' : ''; vid.style.display = v ? '' : 'none';
+  if (v){ vid.src = W + p + '.mp4'; vid.play().catch(()=>{}); } else { vid.pause(); vid.removeAttribute('src'); $('#lb-img').src = big(p); }
   $('#lb-cap').textContent = `${lbName}/${label(p)}   ${String(lbI+1).padStart(2,'0')}/${String(lbSet.length).padStart(2,'0')}`; }
 function stepLB(d){ stopAnim(); lbI = (lbI + d + lbSet.length) % lbSet.length; showLB(); }
-function closeLB(){ stopAnim(); $('#lb').classList.remove('on'); }
+function closeLB(){ stopAnim(); $('#lb').classList.remove('on'); const v = $('#lb-vid'); v.pause(); }
 $('#lb-prev').onclick = ()=>stepLB(-1); $('#lb-next').onclick = ()=>stepLB(1); $('#lb-x').onclick = closeLB;
 $('#lb-img').onclick = ()=> lbAnim ? stopAnim() : stepLB(1);
 
