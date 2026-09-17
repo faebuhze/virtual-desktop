@@ -72,6 +72,15 @@ img{ -webkit-user-drag:none; }
 #shade{ position:absolute; inset:0; z-index:1; pointer-events:none; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 35%, rgba(0,0,0,.6) 100%); }
 
 /* countdown + home sticker */
+#playbtn{ position:absolute; left:600px; top:690px; z-index:41; width:0; height:0; cursor:pointer;
+  border-left:34px solid var(--accent); border-top:20px solid transparent; border-bottom:20px solid transparent;
+  filter:drop-shadow(3px 3px 0 rgba(0,0,0,.5)); }
+#playbtn:after{ content:'play all'; position:absolute; left:-34px; top:24px; width:90px; font:8px/1 'Pix',monospace; color:var(--accent); letter-spacing:1px; }
+#show{ position:absolute; inset:0; z-index:75; display:none; background:#0b0b0b; overflow:hidden; }
+#show.on{ display:block; }
+#show img{ position:absolute; border:2px solid #f4f4f2; box-shadow:6px 6px 0 rgba(0,0,0,.5); animation:drop .28s cubic-bezier(.2,.8,.25,1) both; }
+@keyframes drop{ from{ transform:scale(1.25); opacity:0; } to{ transform:scale(1); opacity:1; } }
+#show .hud{ position:absolute; left:0; right:0; bottom:16px; z-index:5; text-align:center; font:10px 'Pix',monospace; color:var(--accent); letter-spacing:2px; }
 #countdown{ position:absolute; top:10px; right:18px; z-index:41; font-size:30px; line-height:1; color:var(--fg); letter-spacing:1px; }
 .light #countdown{ color:var(--ink); }
 #countdown.over{ color:var(--accent); }
@@ -181,14 +190,10 @@ img{ -webkit-user-drag:none; }
 .pmenu .meta{ font-size:8px; line-height:1.5; letter-spacing:.5px; margin-top:12px; text-transform:uppercase; }
 
 /* 02 press */
-#ticker{ position:absolute; left:100px; right:130px; top:20px; height:22px; background:#0b0b0b; overflow:hidden; z-index:24; }
-#ticker .run2{ display:flex; width:max-content; white-space:nowrap; color:#f4f4f2; font-size:11px; line-height:22px; animation:marq 50s linear infinite; }
-#ticker .run2 span{ padding-right:40px; }
-#ticker em{ font-style:normal; color:var(--accent); }
 #ptable{ position:absolute; left:340px; top:60px; width:720px; height:650px; }
 #ptable .pin{ width:150px; box-shadow:3px 3px 0 rgba(0,0,0,.25); }
 #ptable .pin img{ border:1px solid #bbb; }
-#ptbtns{ position:absolute; left:340px; top:724px; color:var(--ink); }
+#ptbtns{ position:absolute; left:430px; top:726px; color:var(--ink); }
 .paper .fr span{ color:#555; }
 #pg{ position:absolute; top:44px; left:420px; width:780px; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; }
 #pg img{ display:block; cursor:pointer; background:#ddd; }
@@ -258,6 +263,8 @@ img{ -webkit-user-drag:none; }
   <div id="shade"></div>
 
   <div id="countdown" class="term">10:00</div>
+  <div id="playbtn" class="drg" title="play all"></div>
+  <div id="show"><div class="hud">click to close</div></div>
   <img id="homebtn" class="sticker" src="web/00_shapes/ebene_2.png" draggable="false" title="desktop">
 
   <!-- ======================= HUB ======================= -->
@@ -332,9 +339,6 @@ img{ -webkit-user-drag:none; }
   </div>
 
   <div class="view paper" id="v-press" data-key="press">
-    <!-- ✏️ EDIT ticker text (words starting with # get the accent colour) -->
-    <div id="ticker" class="pix"><div class="run2" data-text="+++ breaking +++ hunderte biolumineszente signalcodes in der molloy-tiefe +++ #ThisIsOnlyTheTipOfTheIceberg +++ state date +++ krypto-farmen im methanhydrat +++ #WakeUp +++ unterwasserstartrampen mit ferrofluid-antrieb +++ #StopSpaceX +++ #LetTheOceanAlive +++ die tiefsee ist der perfekte rechtsfreie raum +++"></div></div>
-    <!-- ✏️ /EDIT -->
     <div class="fr" style="left:40px;top:66px;width:262px;height:360px" data-src="02_press/einzelseiten_druck_300dpi-1"><img style="object-fit:contain;background:transparent;border:0;"><span>front_page.pdf</span></div>
     <div class="win tile" data-group="pscans" style="left:40px;top:456px;width:300px;"><div class="bar"><i></i><b>scans</b></div><div class="body tg" style="height:96px;"></div></div>
     <div class="win txtwin" data-handle=".bar" data-txt="forum_leak.txt" style="left:1070px;top:300px;width:180px;--h:150px;"><div class="bar"><i></i><b>article.txt</b></div><div class="body"><pre></pre></div></div>
@@ -452,7 +456,7 @@ for (const k in OBJ) OBJ[k] = OBJ[k].map(n=>'01_object/'+n);
 S.obj = Object.values(OBJ).flat();
 const OBJNAMES = {watch:'00_the_watch', raw:'01_raw_scans', edits:'02_edits', booklet:'03_booklet_repro', line:'04_clothesline', pscans:'scans'};
 /* desktop files from 00_HKB: [file in web/00_desk, original name, i=image / v=video] */
-const DESK = [["1_bildfindung_01","scan_2025-12-15_11-07-13.tif","i"],["1_bildfindung_04","scan_2025-12-15_11-15-06.tif","i"],["1_bildfindung_07","scan_2025-12-15_11-30-50.tif","i"],["1_bildfindung_13","scan_2025-12-15_11-38-05.tif","i"],["1_bildfindung_16","scan_2025-12-15_11-41-33.tif","i"],["1_bildfindung_21","scan_2025-12-15_11-48-41.tif","i"],["1_bildfindung_24","scan_2025-12-15_11-57-13.tif","i"],["1_bildfindung_33","Poster1.tif","i"],["1_bildfindung_34","Poster2.tif","i"],["1_bildfindung_38","Poster4.tif","i"],["1_exhibition_01","05FBC676-C571-4FCA-BF82-E7944231A1F3-766-00000006FCC8CABD.jpg","i"],["1_exhibition_04","872005F0-AE40-47A7-916C-331A674F4AB7-766-00000007048F3B18.jpg","i"],["1_exhibition_07","D342DAB6-2C88-46DA-9D25-300B81DC88E9-766-000000070200EBA3.jpg","i"],["1_exhibition_09","FE716961-30C4-48FC-B080-B2EDB0866015.jpg","i"],["1_indesign_01","Entwurf_1_Publikation_Ausdruck_1.pdf p1","i"],["1_indesign_05","FINALFINALFINALFINAL7.pdf p2","i"],["1_indesign_06","FINALFINALFINALFINAL7.pdf p3","i"],["1_indesign_08","FINALFINALFINALFINAL7.pdf p5","i"],["1_labwoche_02","IMG_3215.mov","v"],["1_labwoche_03","Journal_Labwoche_Fabio_no_video.pdf p1","i"],["1_labwoche_05","Journal_Labwoche_Fabio_no_video.pdf p3","i"],["1_labwoche_06","Journal_Labwoche_Fabio_no_video.pdf p4","i"],["1_repro_01","Buchoffen_IMG_0892.jpg","i"],["1_repro_03","Klopapier.tif","i"],["1_repro_05","scan_2026-01-14_18-21-42.tif","i"],["1_repro_10","_E7A8937.JPG","i"],["1_repro_11","_E7A8944.JPG","i"],["1_repro_13","_E7A8958.JPG","i"],["1_repro_16","_E7A9017.JPG","i"],["1_repro_18","DSCF7721.JPG","i"],["1_repro_19","DSCF7727.JPG","i"],["1_repro_22","_E7A6283.JPG","i"],["1_repro_26","HS2025_FotoVIscom_Fabio_Riesen_Fotos.pdf p1","i"],["1_typedesign_01","RiesenFabio_specimen.pdf p1","i"],["1_typedesign_02","RiesenFabio_specimen.pdf p2","i"],["1_typedesign_03","RiesenFabio_specimen.pdf p3","i"],["1_typedesign_04","RiesenFabio_specimen.pdf p5","i"],["1_typedesign_05","RiesenFabio_specimen.pdf p7","i"],["1_typo_01","3bca0134-54b4-4a62-9fc6-5a442a938ade.JPG","i"],["1_typo_03","IMG_2495.HEIC","i"],["1_typo_04","IMG_2496.HEIC","i"],["1_typo_09","IMG_2501.HEIC","i"],["1_typo_10","IMG_2504.HEIC","i"],["1_typo_12","IMG_2509.HEIC","i"],["1_typo_14","IMG_2576.HEIC","i"],["1_typo_15","IMG_2577.HEIC","i"],["1_zine_01","Zinee0001.tif","i"],["1_zine_02","Zinee0002.tif","i"],["1_zine_03","Zinee0003.tif","i"],["1_zine_05","Zinee0005.tif","i"],["1_zine_08","Zinee0008.tif","i"],["1_zine_10","Zinee0010.tif","i"],["1_zine_12","Zinee0012.tif","i"],["2_3d_01","renderfirstcd.png","i"],["2_imagesound_01","inoutrender.mp4","v"],["2_imagesound_02","showcase1.mp4","v"],["2_imagesound_03","SUFFOCATION_WAVES.mp4","v"],["2_infographics_01","WORKFILE.png","i"],["2_infographics_03","gray_arc-11.png","i"],["2_infographics_06","gray_arc-2.png","i"],["2_infographics_09","gray_arc-5.png","i"],["2_infographics_15","gray_signal_portrait.png","i"],["2_infographics_19","composition2.png","i"],["2_infographics_22","FInal_Poster.tif","i"],["2_layout_03","Gemini_Generated_Image_cgxxqkcgxxqkcgxx.png","i"],["2_layout_04","PUPIGEBURI_LUV.png","i"],["2_layout_05","animecheib.png","i"],["2_layout_09","bloodfalls.png","i"],["2_layout_12","globeee_dither.png","i"],["2_layout_15","huere_figgaehrrr_drainedcheib.png","i"],["2_layout_19","katyperry.png","i"],["2_layout_24","pings.png","i"],["2_layout_30","schwimmviech.png","i"],["2_layout_33","sharksiech.png","i"],["2_layout_36","teletext.png","i"],["2_layout_40","Maquetten_Druck_Layoutfff_ansicht_doppel.pdf p1","i"],["2_photoweek_01","IMG_1212 2.jpg","i"],["2_photoweek_02","IMG_1213 2.jpg","i"],["2_photoweek_05","IMG_1224 2.jpg","i"],["2_photoweek_09","IMG_1242 2.jpg","i"],["2_photoweek_12","IMG_1289 2.jpg","i"],["2_photoweek_14","IMG_1304 2.jpg","i"],["2_photoweek_19","IMG_1336 2.jpg","i"],["2_photoweek_20","IMG_1338 2.jpg","i"]];
+const DESK = [["1_bildfindung_01","scan_2025-12-15_11-07-13.tif","i"],["1_bildfindung_04","scan_2025-12-15_11-15-06.tif","i"],["1_bildfindung_07","scan_2025-12-15_11-30-50.tif","i"],["1_bildfindung_13","scan_2025-12-15_11-38-05.tif","i"],["1_bildfindung_16","scan_2025-12-15_11-41-33.tif","i"],["1_bildfindung_21","scan_2025-12-15_11-48-41.tif","i"],["1_bildfindung_24","scan_2025-12-15_11-57-13.tif","i"],["1_bildfindung_33","Poster1.tif","i"],["1_bildfindung_34","Poster2.tif","i"],["1_bildfindung_38","Poster4.tif","i"],["1_exhibition_01","05FBC676-C571-4FCA-BF82-E7944231A1F3-766-00000006FCC8CABD.jpg","i"],["1_exhibition_04","872005F0-AE40-47A7-916C-331A674F4AB7-766-00000007048F3B18.jpg","i"],["1_exhibition_07","D342DAB6-2C88-46DA-9D25-300B81DC88E9-766-000000070200EBA3.jpg","i"],["1_exhibition_09","FE716961-30C4-48FC-B080-B2EDB0866015.jpg","i"],["1_indesign_01","Entwurf_1_Publikation_Ausdruck_1.pdf p1","i"],["1_indesign_05","FINALFINALFINALFINAL7.pdf p2","i"],["1_indesign_06","FINALFINALFINALFINAL7.pdf p3","i"],["1_indesign_08","FINALFINALFINALFINAL7.pdf p5","i"],["1_labwoche_02","IMG_3215.mov","v"],["1_labwoche_03","Journal_Labwoche_Fabio_no_video.pdf p1","i"],["1_labwoche_05","Journal_Labwoche_Fabio_no_video.pdf p3","i"],["1_labwoche_06","Journal_Labwoche_Fabio_no_video.pdf p4","i"],["1_repro_01","Buchoffen_IMG_0892.jpg","i"],["1_repro_03","Klopapier.tif","i"],["1_repro_05","scan_2026-01-14_18-21-42.tif","i"],["1_repro_10","_E7A8937.JPG","i"],["1_repro_11","_E7A8944.JPG","i"],["1_repro_13","_E7A8958.JPG","i"],["1_repro_16","_E7A9017.JPG","i"],["1_repro_18","DSCF7721.JPG","i"],["1_repro_19","DSCF7727.JPG","i"],["1_repro_22","_E7A6283.JPG","i"],["1_repro_26","HS2025_FotoVIscom_Fabio_Riesen_Fotos.pdf p1","i"],["1_typedesign_01","RiesenFabio_specimen.pdf p1","i"],["1_typedesign_02","RiesenFabio_specimen.pdf p2","i"],["1_typedesign_03","RiesenFabio_specimen.pdf p3","i"],["1_typedesign_04","RiesenFabio_specimen.pdf p5","i"],["1_typedesign_05","RiesenFabio_specimen.pdf p7","i"],["1_typo_01","3bca0134-54b4-4a62-9fc6-5a442a938ade.JPG","i"],["1_typo_03","IMG_2495.HEIC","i"],["1_typo_04","IMG_2496.HEIC","i"],["1_typo_09","IMG_2501.HEIC","i"],["1_typo_10","IMG_2504.HEIC","i"],["1_typo_12","IMG_2509.HEIC","i"],["1_typo_14","IMG_2576.HEIC","i"],["1_typo_15","IMG_2577.HEIC","i"],["1_zine_01","Zinee0001.tif","i"],["1_zine_02","Zinee0002.tif","i"],["1_zine_03","Zinee0003.tif","i"],["1_zine_05","Zinee0005.tif","i"],["1_zine_08","Zinee0008.tif","i"],["1_zine_10","Zinee0010.tif","i"],["2_3d_01","renderfirstcd.png","i"],["2_imagesound_01","inoutrender.mp4","v"],["2_imagesound_02","showcase1.mp4","v"],["2_imagesound_03","SUFFOCATION_WAVES.mp4","v"],["2_infographics_01","WORKFILE.png","i"],["2_infographics_03","gray_arc-11.png","i"],["2_infographics_06","gray_arc-2.png","i"],["2_infographics_09","gray_arc-5.png","i"],["2_infographics_15","gray_signal_portrait.png","i"],["2_infographics_19","composition2.png","i"],["2_infographics_22","FInal_Poster.tif","i"],["2_layout_03","Gemini_Generated_Image_cgxxqkcgxxqkcgxx.png","i"],["2_layout_04","PUPIGEBURI_LUV.png","i"],["2_layout_05","animecheib.png","i"],["2_layout_09","bloodfalls.png","i"],["2_layout_12","globeee_dither.png","i"],["2_layout_15","huere_figgaehrrr_drainedcheib.png","i"],["2_layout_19","katyperry.png","i"],["2_layout_24","pings.png","i"],["2_layout_30","schwimmviech.png","i"],["2_layout_33","sharksiech.png","i"],["2_layout_36","teletext.png","i"],["2_layout_40","Maquetten_Druck_Layoutfff_ansicht_doppel.pdf p1","i"],["2_photoweek_01","IMG_1212 2.jpg","i"],["2_photoweek_02","IMG_1213 2.jpg","i"],["2_photoweek_05","IMG_1224 2.jpg","i"],["2_photoweek_09","IMG_1242 2.jpg","i"],["2_photoweek_12","IMG_1289 2.jpg","i"],["2_photoweek_14","IMG_1304 2.jpg","i"],["2_photoweek_19","IMG_1336 2.jpg","i"],["2_photoweek_20","IMG_1338 2.jpg","i"]];
 const ARCHP = DESK.map(a=>'00_desk/'+a[0]);
 const VIDS = new Set(DESK.filter(a=>a[2]==='v').map(a=>'00_desk/'+a[0]));
 const SHAPES = ['ebene_1','ebene_2','rossofuoco','women','ebene_9','ebene_10','ebene_13','ebene_16','ebene_18'].map(n=>'web/00_shapes/'+n+'.png');
@@ -552,7 +556,7 @@ CL.forEach(c=>{
     addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, c.key, false);
   });
 });
-const ZONES = [[240,700,100,70],[860,630,110,120],[690,100,180,110],[410,270,460,200],[664,56,260,230],[16,310,226,150],[1020,50,260,110],[1150,0,130,50],[228,222,166,100],[550,140,110,110],[0,0,1280,34],[40,40,330,60],[940,186,340,56],[660,600,200,44],[50,458,360,48],[950,546,330,56],[590,490,190,30],[0,770,560,30],[420,110,100,70],[1160,100,100,70],[360,700,100,70],[865,480,100,70]];
+const ZONES = [[580,670,140,80],[240,700,100,70],[860,630,110,120],[690,100,180,110],[410,270,460,200],[664,56,260,230],[16,310,226,150],[1020,50,260,110],[1150,0,130,50],[228,222,166,100],[550,140,110,110],[0,0,1280,34],[40,40,330,60],[940,186,340,56],[660,600,200,44],[50,458,360,48],[950,546,330,56],[590,490,190,30],[0,770,560,30],[420,110,100,70],[1160,100,100,70],[360,700,100,70],[865,480,100,70]];
 const inZone = (x,y) => ZONES.some(([zx,zy,zw,zh]) => x > zx-20 && x < zx+zw+20 && y > zy-20 && y < zy+zh+20)
   || CL.some(c => ((x-c.cx)/(c.rx+45))**2 + ((y-c.cy)/(c.ry+45))**2 < 1);
 ARCHP.forEach(p=>{
@@ -562,6 +566,7 @@ ARCHP.forEach(p=>{
   if (t < 700) addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, null, true);
 });
 $$('#hub .drg').forEach(makeDrag);
+makeDrag($('#playbtn'));
 $$('.view .sticker').forEach(makeDrag);
 
 
@@ -990,10 +995,6 @@ $$('.view .tile').forEach(t=>{
 $$('.view .tile .bar i').forEach(b=>b.style.visibility = 'hidden');
 
 /* ============================ 02 PRESS ============================ */
-(function(){
-  const run = $('#ticker .run2'), t = run.dataset.text.replace(/(#\w+)/g, '<em>$1</em>');
-  run.innerHTML = `<span>${t}</span><span>${t}</span>`;
-})();
 const ptable = $('#ptable'); let pz = 20;
 const ppins = S.pages.slice(1).map((p,i,arr)=>{
   const d = document.createElement('div'); d.className = 'pin';
@@ -1117,6 +1118,37 @@ $$('.win .bar i').forEach(b=>{
     setTimeout(()=>{ w.style.display = 'none'; w.classList.remove('closing'); }, 230); });
 });
 
+/* ============================ PLAY ALL — everything stacks up, one image every 0.5 s ============================ */
+const SHOW_GAP = 500;                       /* ✏️ EDIT: milliseconds between images */
+const SHOW_LIST = [...ARCHP.filter(p=>!VIDS.has(p)), ...S.months, ...S.frac.filter((_,i)=>i%3===0), ...S.obj.filter((_,i)=>i%3===0), ...S.pages];
+let showT = null;
+function playAll(){
+  const el = $('#show');
+  if (el.classList.contains('on')) return stopShow();
+  el.classList.add('on'); popIn(el, [640,400]); $('#playbtn').style.display = 'none'; $('#countdown').style.opacity = '.25';
+  $$('#show img').forEach(i=>i.remove());
+  let i = 0;
+  const rs = mulberry(4242);
+  const step = ()=>{
+    if (i >= SHOW_LIST.length){ showT = null; return; }
+    const p = SHOW_LIST[i++];
+    const im = new Image(); im.src = big(p);
+    const w = 320 + rs()*420;
+    im.style.width = w + 'px';
+    im.style.left = Math.round(rs()*(1280 - w*.7) - w*.15) + 'px';
+    im.style.top = Math.round(rs()*640 - 60) + 'px';
+    im.style.zIndex = i;
+    $('#show').appendChild(im);
+    while ($$('#show img').length > 60) $('#show img').remove();
+    showT = setTimeout(step, SHOW_GAP);
+  };
+  step();
+}
+function stopShow(){ clearTimeout(showT); showT = null; $('#show').classList.remove('on'); $$('#show img').forEach(i=>i.remove());
+  $('#playbtn').style.display = cur ? 'none' : 'block'; $('#countdown').style.opacity = ''; }
+$('#playbtn').onclick = playAll;
+$('#show').onclick = stopShow;
+
 /* ============================ NOTES + TIMER ============================ */
 let tStart = null, secKey = 'home';
 const secT = {}; let secSince = null;
@@ -1124,6 +1156,7 @@ const fmt = sec => String(Math.floor(sec/60)).padStart(2,'0') + ':' + String(Mat
 function setSection(k){
   const onHub = !k || k === 'home' || k === 'q';
   $('#homebtn').style.display = onHub ? 'none' : 'block';
+  $('#playbtn').style.display = onHub ? 'block' : 'none';
   const now = performance.now();
   if (secSince !== null) secT[secKey] = (secT[secKey]||0) + (now - secSince)/1000;
   secKey = k || 'home'; secSince = now;
@@ -1143,13 +1176,14 @@ addEventListener('keydown', e=>{
   if (e.target.tagName === 'SELECT') return;
   if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','PageUp','PageDown','Home','End'].includes(e.key)) e.preventDefault();
   if ($('#loader').style.display !== 'none'){ if (e.key === 'Enter' || e.key === ' ') enter(); return; }
-  if (e.key === 'Escape') return back();
+  if (e.key === 'Escape'){ if (showT !== null || $('#show').classList.contains('on')) return stopShow(); return back(); }
   const lb = $('#lb').classList.contains('on');
   if (e.key === 'ArrowRight'){ lb ? stepLB(1) : cur === 'frac' && showFrac(fI+1); }
   if (e.key === 'ArrowLeft'){ lb ? stepLB(-1) : cur === 'frac' && showFrac(fI-1); }
   if (/^[1-5]$/.test(e.key)) open(ORDER[+e.key-1]);
   if (e.key === 'n') next();
   if (e.key === 'r') startTimer();
+  if (e.key === 'p') playAll();
   if (e.key === 't'){ TRANS = TRANS_LIST[(TRANS_LIST.indexOf(TRANS)+1) % TRANS_LIST.length]; console.log('transition:', TRANS); }
 });
 /* never let the browser scroll the stage */
