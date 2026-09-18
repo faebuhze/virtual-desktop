@@ -72,15 +72,6 @@ img{ -webkit-user-drag:none; }
 #shade{ position:absolute; inset:0; z-index:1; pointer-events:none; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 35%, rgba(0,0,0,.6) 100%); }
 
 /* countdown + home sticker */
-#playbtn{ position:absolute; left:600px; top:690px; z-index:41; width:0; height:0; cursor:pointer;
-  border-left:34px solid var(--accent); border-top:20px solid transparent; border-bottom:20px solid transparent;
-  filter:drop-shadow(3px 3px 0 rgba(0,0,0,.5)); }
-#playbtn:after{ content:'play all'; position:absolute; left:-34px; top:24px; width:90px; font:8px/1 'Pix',monospace; color:var(--accent); letter-spacing:1px; }
-#show{ position:absolute; inset:0; z-index:75; display:none; background:#0b0b0b; overflow:hidden; }
-#show.on{ display:block; }
-#show img{ position:absolute; border:2px solid #f4f4f2; box-shadow:6px 6px 0 rgba(0,0,0,.5); animation:drop .28s cubic-bezier(.2,.8,.25,1) both; }
-@keyframes drop{ from{ transform:scale(1.25); opacity:0; } to{ transform:scale(1); opacity:1; } }
-#show .hud{ position:absolute; left:0; right:0; bottom:16px; z-index:5; text-align:center; font:10px 'Pix',monospace; color:var(--accent); letter-spacing:2px; }
 #countdown{ position:absolute; top:10px; right:18px; z-index:41; font-size:30px; line-height:1; color:var(--fg); letter-spacing:1px; }
 .light #countdown{ color:var(--ink); }
 #countdown.over{ color:var(--accent); }
@@ -263,8 +254,6 @@ img{ -webkit-user-drag:none; }
   <div id="shade"></div>
 
   <div id="countdown" class="term">10:00</div>
-  <div id="playbtn" class="drg" title="play all"></div>
-  <div id="show"><div class="hud">click to close</div></div>
   <img id="homebtn" class="sticker" src="web/00_shapes/ebene_2.png" draggable="false" title="desktop">
 
   <!-- ======================= HUB ======================= -->
@@ -541,7 +530,7 @@ function addFile(p, x, y, w, h, key, loose){
   s.style.width = Math.max(w+24, 70) + 'px';
   d.append(el, s);
   if (key){ d.dataset.open = key; d.dataset.tease = key; }
-  else { d.dataset.tease = 'arch'; d.addEventListener('click', ()=>openLB(ARCHP, ARCHP.indexOf(p), NAMES.arch)); }
+  else { d.dataset.tease = 'arch'; d.addEventListener('click', ()=>openLB(FLIP, Math.max(0, FLIP.indexOf(p)), NAMES.arch, FLIP_GAP)); }
   files.appendChild(d);
   placed.push({x:x+w/2, y:y+h/2, r:Math.max(w,h)/2});
 }
@@ -566,7 +555,6 @@ ARCHP.forEach(p=>{
   if (t < 700) addFile(p, Math.round(x-w/2), Math.round(y-h/2), w, h, null, true);
 });
 $$('#hub .drg').forEach(makeDrag);
-makeDrag($('#playbtn'));
 $$('.view .sticker').forEach(makeDrag);
 
 
@@ -962,7 +950,7 @@ $$('[data-arch]').forEach(f=> f.addEventListener('click', ()=>{
 /* ============================ LIGHTBOX ============================ */
 let lbSet = [], lbI = 0, lbName = '', lbAnim = null;
 function openLB(set, i, name, anim){ stopAnim(); lbSet = set; lbI = Math.max(0,i); lbName = name || ''; showLB(); $('#lb').classList.add('on'); popIn($('#lb'));
-  if (anim) lbAnim = setInterval(()=>{ lbI = (lbI+1) % lbSet.length; showLB(); }, 160); }
+  if (anim) lbAnim = setInterval(()=>{ lbI = (lbI+1) % lbSet.length; showLB(); }, anim === true ? 160 : anim); }
 function stopAnim(){ clearInterval(lbAnim); lbAnim = null; }
 function showLB(){ const p = lbSet[lbI], v = VIDS.has(p), vid = $('#lb-vid');
   $('#lb-img').style.display = v ? 'none' : ''; vid.style.display = v ? '' : 'none';
@@ -1118,36 +1106,10 @@ $$('.win .bar i').forEach(b=>{
     setTimeout(()=>{ w.style.display = 'none'; w.classList.remove('closing'); }, 230); });
 });
 
-/* ============================ PLAY ALL — everything stacks up, one image every 0.5 s ============================ */
-const SHOW_GAP = 500;                       /* ✏️ EDIT: milliseconds between images */
-const SHOW_LIST = [...ARCHP.filter(p=>!VIDS.has(p)), ...S.months, ...S.frac.filter((_,i)=>i%3===0), ...S.obj.filter((_,i)=>i%3===0), ...S.pages];
-let showT = null;
-function playAll(){
-  const el = $('#show');
-  if (el.classList.contains('on')) return stopShow();
-  el.classList.add('on'); popIn(el, [640,400]); $('#playbtn').style.display = 'none'; $('#countdown').style.opacity = '.25';
-  $$('#show img').forEach(i=>i.remove());
-  let i = 0;
-  const rs = mulberry(4242);
-  const step = ()=>{
-    if (i >= SHOW_LIST.length){ showT = null; return; }
-    const p = SHOW_LIST[i++];
-    const im = new Image(); im.src = big(p);
-    const w = 320 + rs()*420;
-    im.style.width = w + 'px';
-    im.style.left = Math.round(rs()*(1280 - w*.7) - w*.15) + 'px';
-    im.style.top = Math.round(rs()*640 - 60) + 'px';
-    im.style.zIndex = i;
-    $('#show').appendChild(im);
-    while ($$('#show img').length > 60) $('#show img').remove();
-    showT = setTimeout(step, SHOW_GAP);
-  };
-  step();
-}
-function stopShow(){ clearTimeout(showT); showT = null; $('#show').classList.remove('on'); $$('#show img').forEach(i=>i.remove());
-  $('#playbtn').style.display = cur ? 'none' : 'block'; $('#countdown').style.opacity = ''; }
-$('#playbtn').onclick = playAll;
-$('#show').onclick = stopShow;
+
+/* ============================ FLIPBOOK — click any desktop file, it zaps through everything ============================ */
+const FLIP_GAP = 500;   /* ✏️ EDIT: milliseconds per image */
+const FLIP = [...ARCHP.filter(p=>!VIDS.has(p)), ...S.months, ...S.frac.filter((_,i)=>i%3===0), ...S.obj.filter((_,i)=>i%3===0), ...S.pages];
 
 /* ============================ NOTES + TIMER ============================ */
 let tStart = null, secKey = 'home';
@@ -1156,7 +1118,6 @@ const fmt = sec => String(Math.floor(sec/60)).padStart(2,'0') + ':' + String(Mat
 function setSection(k){
   const onHub = !k || k === 'home' || k === 'q';
   $('#homebtn').style.display = onHub ? 'none' : 'block';
-  $('#playbtn').style.display = onHub ? 'block' : 'none';
   const now = performance.now();
   if (secSince !== null) secT[secKey] = (secT[secKey]||0) + (now - secSince)/1000;
   secKey = k || 'home'; secSince = now;
@@ -1176,14 +1137,13 @@ addEventListener('keydown', e=>{
   if (e.target.tagName === 'SELECT') return;
   if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','PageUp','PageDown','Home','End'].includes(e.key)) e.preventDefault();
   if ($('#loader').style.display !== 'none'){ if (e.key === 'Enter' || e.key === ' ') enter(); return; }
-  if (e.key === 'Escape'){ if (showT !== null || $('#show').classList.contains('on')) return stopShow(); return back(); }
+  if (e.key === 'Escape') return back();
   const lb = $('#lb').classList.contains('on');
   if (e.key === 'ArrowRight'){ lb ? stepLB(1) : cur === 'frac' && showFrac(fI+1); }
   if (e.key === 'ArrowLeft'){ lb ? stepLB(-1) : cur === 'frac' && showFrac(fI-1); }
   if (/^[1-5]$/.test(e.key)) open(ORDER[+e.key-1]);
   if (e.key === 'n') next();
   if (e.key === 'r') startTimer();
-  if (e.key === 'p') playAll();
   if (e.key === 't'){ TRANS = TRANS_LIST[(TRANS_LIST.indexOf(TRANS)+1) % TRANS_LIST.length]; console.log('transition:', TRANS); }
 });
 /* never let the browser scroll the stage */
